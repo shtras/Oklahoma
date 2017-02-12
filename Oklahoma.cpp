@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "Oklahoma.h"
-//Testing origin...
+
 int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd)
 {
     Oklahoma& oklahoma = Oklahoma::GetInstance();
