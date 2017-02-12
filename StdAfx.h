@@ -4,4 +4,5 @@
 #include <SDL.h>
 #include "GL/glew.h"
 
-enum Events {RENDER_INIT = SDL_USEREVENT};
+#include "SmartPtr.h"
+

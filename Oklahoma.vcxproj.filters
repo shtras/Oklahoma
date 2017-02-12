@@ -19,6 +19,12 @@
     <Filter Include="Header Files\Graphics">
       <UniqueIdentifier>{3aed726a-f39b-4d51-9f13-54c9d92bf047}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Helpers">
+      <UniqueIdentifier>{7edbc3a2-4156-4f57-8160-2186e3216d63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers">
+      <UniqueIdentifier>{ec3e0900-dcfe-4cb8-a334-8048ef07537b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Oklahoma.cpp">
@@ -30,6 +36,9 @@
     <ClCompile Include="Graphics\Renderer.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Helpers\SmartPtr.cpp">
+      <Filter>Source Files\Helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
@@ -40,6 +49,9 @@
     </ClInclude>
     <ClInclude Include="Oklahoma.h">
       <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\SmartPtr.h">
+      <Filter>Header Files\Helpers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

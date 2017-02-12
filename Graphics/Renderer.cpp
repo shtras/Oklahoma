@@ -13,7 +13,6 @@ namespace OGraphics
 
     Renderer::~Renderer()
     {
-
     }
 
     void Renderer::Render()

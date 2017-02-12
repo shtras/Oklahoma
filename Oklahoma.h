@@ -11,6 +11,6 @@ private:
     Oklahoma();
     ~Oklahoma();
 
-    OGraphics::Renderer* renderer_;
+    SmartPtr<OGraphics::Renderer> renderer_;
     bool running_;
 };

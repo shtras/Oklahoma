@@ -102,7 +102,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.;SDL;Graphics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;SDL;Graphics;Helpers</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -138,7 +138,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.;SDL;Graphics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;SDL;Graphics;Helpers</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Graphics\Renderer.cpp" />
+    <ClCompile Include="Helpers\SmartPtr.cpp" />
     <ClCompile Include="Oklahoma.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\Renderer.h" />
+    <ClInclude Include="Helpers\SmartPtr.h" />
     <ClInclude Include="Oklahoma.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>

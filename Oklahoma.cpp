@@ -26,8 +26,6 @@ void Oklahoma::Run()
             case SDL_QUIT:
                 running_ = false;
                 break;
-            case RENDER_INIT:
-                break;
             default:
                 break;
             }
@@ -51,5 +49,4 @@ Oklahoma::Oklahoma() :
 
 Oklahoma::~Oklahoma()
 {
-
 }
