@@ -43,6 +43,7 @@ void Oklahoma::Run()
             }
             
         }
+        renderer_->Prepare();
         renderer_->Render();
     }
 }
