@@ -13,15 +13,15 @@ namespace ODiagnostics
 
     void Logger::Log(Severity s, wchar_t* fmt, va_list args)
     {
-        if (s < sev_) {
+        if (!ignoreSeverity_ && s < sev_) {
             return;
         }
         Rotate();
         SYSTEMTIME timeNow;
         GetSystemTime(&timeNow);
         wchar_t logLine[1024];
-        wchar_t timeFormat[] = L"%.2d:%.2d:%.2d.%.3d: ";
-        swprintf_s(logLine, timeFormat, timeNow.wHour, timeNow.wMinute, timeNow.wSecond, timeNow.wMilliseconds);
+        wchar_t timeFormat[] = L"%.2d:%.2d:%.2d.%.3d - %ls: ";
+        swprintf_s(logLine, timeFormat, timeNow.wHour, timeNow.wMinute, timeNow.wSecond, timeNow.wMilliseconds, SeverityToString(s));
         if (timeLength_ == 0) {
             timeLength_ = wcslen(logLine);
         }
@@ -35,7 +35,8 @@ namespace ODiagnostics
     Logger::Logger():
         sev_(LOG_INFO),
         file_(nullptr),
-        timeLength_(0)
+        timeLength_(0),
+        ignoreSeverity_(false)
     {
         
     }
@@ -75,11 +76,37 @@ namespace ODiagnostics
         }
     }
 
+    wchar_t* Logger::SeverityToString(Severity s)
+    {
+        switch (s)
+        {
+        case ODiagnostics::LOG_DEBUG:
+            return L"Debug";
+        case ODiagnostics::LOG_INFO:
+            return L"Info";
+        case ODiagnostics::LOG_WARNING:
+            return L"Warning";
+        case ODiagnostics::LOG_ERROR:
+            return L"Error";
+        default:
+            assert(0);
+        }
+        return nullptr;
+    }
+
     void Logger::Flush()
     {
         if (file_) {
             fflush(file_);
         }
+    }
+
+    void Logger::SetSeverity(Severity s)
+    {
+        sev_ = s;
+        ignoreSeverity_ = true;
+        LogInfo(L"Log severity set to: %ls", SeverityToString(s));
+        ignoreSeverity_ = false;
     }
 
     void LogError(wchar_t* fmt, ...)

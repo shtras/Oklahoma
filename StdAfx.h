@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <iostream>
+#include <assert.h>
 #include <SDL.h>
 #include "GL/glew.h"
 

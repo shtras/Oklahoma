@@ -3,6 +3,9 @@
 
 int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd)
 {
+#ifdef DEBUG
+    ODiagnostics::Logger::GetInstance().SetSeverity(ODiagnostics::LOG_DEBUG);
+#endif
     LogInfo(L"Hello, World!");
     Oklahoma& oklahoma = Oklahoma::GetInstance();
     oklahoma.Init();
