@@ -38,8 +38,6 @@ void Oklahoma::Run()
             case SDL_QUIT:
                 running_ = false;
                 break;
-            default:
-                break;
             }
             
         }

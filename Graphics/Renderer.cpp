@@ -12,7 +12,6 @@ namespace OGraphics
 
     Shader::~Shader()
     {
-
     }
 
     void Shader::Load(const wchar_t* vert, const wchar_t* frag)
@@ -130,6 +129,7 @@ namespace OGraphics
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer_);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * numIndexes_, indexes_, GL_STATIC_DRAW);
     }
+
     void Renderer::Render()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -166,11 +166,12 @@ namespace OGraphics
             GL_UNSIGNED_SHORT,   // type
             (void*)0           // element array buffer offset
         );
-        GLERR
+        
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         
         SDL_GL_SwapWindow(mainWindow_);
+        GLERR
     }
 
     void Renderer::Init()
@@ -181,6 +182,8 @@ namespace OGraphics
             SDL_WINDOWPOS_UNDEFINED, width_, height_, flags);
         mainGLContext_ = SDL_GL_CreateContext(mainWindow_);
         glewInit();
+
+        glViewport(0, 0, width_, height_);
 
         glm::mat4 Projection = glm::perspective(glm::radians(45.0f), (float)width_ / (float)height_, 0.1f, 100.0f);
         glm::mat4 View = glm::lookAt(glm::vec3(0, 3, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
