@@ -5,12 +5,20 @@ int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance
 {
 #ifdef DEBUG
     ODiagnostics::Logger::GetInstance().SetSeverity(ODiagnostics::LOG_DEBUG);
+    AllocConsole();
+    FILE* stream = NULL;
+    errno_t err = freopen_s(&stream, "CON", "w", stdout);
 #endif
+
     LogInfo(L"Hello, World!");
     Oklahoma& oklahoma = Oklahoma::GetInstance();
     oklahoma.Init();
     oklahoma.Run();
     LogInfo(L"Bye.");
+
+#ifdef DEBUG
+    FreeConsole();
+#endif
     return 0;
 }
 

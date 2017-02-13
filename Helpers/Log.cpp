@@ -30,6 +30,10 @@ namespace ODiagnostics
         vswprintf_s(logLineItr, 1024 - timeLength_, fmt, args);
         
         fwprintf_s(file_, L"%ls\n", logLine);
+#ifdef DEBUG
+        std::wcout << logLine;
+#endif
+
     }
 
     Logger::Logger():
