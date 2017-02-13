@@ -25,6 +25,9 @@
     <Filter Include="Header Files\Helpers">
       <UniqueIdentifier>{ec3e0900-dcfe-4cb8-a334-8048ef07537b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{88f4cc2b-fe84-478c-9043-919345947857}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Oklahoma.cpp">
@@ -65,5 +68,13 @@
     <ClInclude Include="Helpers\helpers.h">
       <Filter>Header Files\Helpers</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

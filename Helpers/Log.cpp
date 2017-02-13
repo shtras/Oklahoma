@@ -63,7 +63,7 @@ namespace ODiagnostics
         if (!DirectoryExists(L"Logs")) {
             CreateDirectory(L"Logs", 0);
         }
-        swprintf_s(path, L"Logs\\Oklahoma_%2d_%2d_%2d.log", logDate_.wDay, logDate_.wMonth, logDate_.wYear);
+        swprintf_s(path, L"Logs\\Oklahoma_%.2d_%.2d_%.2d.log", logDate_.wDay, logDate_.wMonth, logDate_.wYear/100);
         file_ = _wfsopen(path, L"a+", _SH_DENYNO);
     }
 

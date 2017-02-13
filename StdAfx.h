@@ -2,9 +2,16 @@
 
 #include <Windows.h>
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <assert.h>
+#include <vector>
+
 #include <SDL.h>
 #include "GL/glew.h"
+#include "glm/glm.hpp"
+#include "glm/gtx/transform.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #include "SmartPtr.h"
 #include "helpers.h"
