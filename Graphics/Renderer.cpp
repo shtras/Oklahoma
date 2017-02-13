@@ -28,7 +28,7 @@ namespace OGraphics
 
             VertexShaderStream.close();
         } else {
-            LogError(L"Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vert);
+            LogError(L"Could not open vertex shader: %ls", vert);
             return;
         }
 
@@ -41,6 +41,9 @@ namespace OGraphics
                 FragmentShaderCode += "\n" + Line;
 
             FragmentShaderStream.close();
+        } else {
+            LogError(L"Could not open fragment shader: %ls", frag);
+            return;
         }
 
         GLint Result = GL_FALSE;
@@ -189,8 +192,8 @@ namespace OGraphics
         glm::mat4 View = glm::lookAt(glm::vec3(0, 3, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
         glm::mat4 Model = glm::mat4(1.0f);
         mvp_ = Projection * View * Model;
-        shader_ = new Shader();
-        shader_->Load(L"Shaders\\vert.glsl", L"Shaders\frag.glsl");
+         shader_ = new Shader();
+         shader_->Load(L"Shaders\\vert.glsl", L"Shaders\\frag.glsl");
 
         glGenBuffers(1, &vertexBuffer_);
         glGenBuffers(1, &colorBuffer_);
@@ -214,17 +217,17 @@ namespace OGraphics
         vertices_[numVertices_++] = 0;
 
         colors_[numColors_++] = 1.0f;
-        colors_[numColors_++] = 1.0f;
+        colors_[numColors_++] = 0;
         colors_[numColors_++] = 0;
         colors_[numColors_++] = 1.0f;
         colors_[numColors_++] = 1.0f;
         colors_[numColors_++] = 0;
         colors_[numColors_++] = 1.0f;
         colors_[numColors_++] = 1.0f;
+        colors_[numColors_++] = 1.0f;
         colors_[numColors_++] = 0;
         colors_[numColors_++] = 1.0f;
         colors_[numColors_++] = 1.0f;
-        colors_[numColors_++] = 0;
 
         indexes_[numIndexes_++] = 0;
         indexes_[numIndexes_++] = 3;

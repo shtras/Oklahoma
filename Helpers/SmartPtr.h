@@ -36,7 +36,7 @@ class SmartPtr
 {
 public:
     SmartPtr() :
-        inner_(NULL)
+        inner_(nullptr)
     {
 
     }
@@ -73,7 +73,9 @@ public:
 
     void Release()
     {
-        inner_->Release();
+        if (inner_) {
+            inner_->Release();
+        }
     }
     operator T* ()
     {
