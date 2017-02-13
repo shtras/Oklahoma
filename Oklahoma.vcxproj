@@ -151,6 +151,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Graphics\Renderer.cpp" />
+    <ClCompile Include="Helpers\helpers.cpp" />
+    <ClCompile Include="Helpers\Log.cpp" />
     <ClCompile Include="Helpers\SmartPtr.cpp" />
     <ClCompile Include="Oklahoma.cpp" />
     <ClCompile Include="StdAfx.cpp">
@@ -160,6 +162,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\Renderer.h" />
+    <ClInclude Include="Helpers\helpers.h" />
+    <ClInclude Include="Helpers\Log.h" />
     <ClInclude Include="Helpers\SmartPtr.h" />
     <ClInclude Include="Oklahoma.h" />
     <ClInclude Include="StdAfx.h" />

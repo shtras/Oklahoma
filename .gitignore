@@ -3,3 +3,4 @@ Oklahoma.VC.VC.opendb
 Oklahoma.VC.db
 x64/
 *.ipch
+*.log

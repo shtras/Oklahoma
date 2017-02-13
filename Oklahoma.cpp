@@ -3,10 +3,11 @@
 
 int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd)
 {
+    LogInfo(L"Hello, World!");
     Oklahoma& oklahoma = Oklahoma::GetInstance();
     oklahoma.Init();
     oklahoma.Run();
-
+    LogInfo(L"Bye.");
     return 0;
 }
 
