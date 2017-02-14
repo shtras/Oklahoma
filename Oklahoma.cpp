@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "Oklahoma.h"
+#include "Version.h"
 
 int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd)
 {
@@ -7,10 +8,11 @@ int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance
     ODiagnostics::Logger::GetInstance().SetSeverity(ODiagnostics::LOG_DEBUG);
     AllocConsole();
     FILE* stream = NULL;
-    errno_t err = freopen_s(&stream, "CON", "w", stdout);
+    errno_t err = _wfreopen_s(&stream, L"CON", L"w", stdout);
+    std::wcout.clear();
 #endif
 
-    LogInfo(L"Hello, World!");
+    LogInfo(L"Entering the matrix. %d.%d.%d", Version::MAJOR, Version::MINOR, Version::REVISION);
     Oklahoma& oklahoma = Oklahoma::GetInstance();
     oklahoma.Init();
     oklahoma.Run();
