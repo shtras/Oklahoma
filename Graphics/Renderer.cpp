@@ -235,8 +235,8 @@ namespace OGraphics
 
         glViewport(0, 0, width_, height_);
 
-        glm::mat4 Projection = glm::perspective(glm::radians(45.0f), (float)width_ / (float)height_, 0.1f, 100.0f);
-        glm::mat4 View = glm::lookAt(glm::vec3(0, 3, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        glm::mat4 Projection = glm::perspective(glm::radians(-45.0f), (float)width_ / (float)height_, 0.1f, 100.0f);
+        glm::mat4 View = glm::lookAt(glm::vec3(0, 0, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
         glm::mat4 Model = glm::mat4(1.0f);
         mvp_ = Projection * View * Model;
         shader_ = new Shader();
@@ -253,20 +253,19 @@ namespace OGraphics
         glDepthFunc(GL_LESS);
         glEnable(GL_CULL_FACE);
 
-        vertices_[numVertices_] = { -1.0f, -1.0f, 0 };
-        uvs_[numVertices_++] = { 0.2f, 0.2f };
-        vertices_[numVertices_] = { 1.0f, -1.0f, 0 };
-        uvs_[numVertices_++] = { 0.8f, 0.2f };
-        vertices_[numVertices_] = { -1.0f, 1.0f, 0 };
-        uvs_[numVertices_++] = { 0.2f, 0.8f };
-        vertices_[numVertices_] = { 1.0f, 1.0f, 0 };
-        uvs_[numVertices_++] = { 0.8f, 0.8f };
-        indexes_[numIndexes_++] = 0;
-        indexes_[numIndexes_++] = 3;
-        indexes_[numIndexes_++] = 1;
-        indexes_[numIndexes_++] = 0;
-        indexes_[numIndexes_++] = 2;
-        indexes_[numIndexes_++] = 3;
+        DrawRect({ -1.0f, -1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+        DrawRect({ 0.0f, 0.0f, 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+    }
+
+    void Renderer::DrawRect(Rect&& pos, Rect&& tex)
+    {
+        AddVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
+        AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
+        AddVertex({ pos.left + pos.width, pos.top, 0 }, { tex.left + tex.width, tex.top });
+
+        AddVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
+        AddVertex({ pos.left, pos.top + pos.height, 0 }, { tex.left, tex.top + tex.height });
+        AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
     }
 
     void Renderer::Cleanup()
@@ -277,4 +276,18 @@ namespace OGraphics
         SDL_GL_DeleteContext(mainGLContext_);
         SDL_DestroyWindow(mainWindow_);
     }
+
+    void Renderer::AddVertex(const Vertex&& v, const UV&& uv)
+    {
+        for (int i = 0; i < numVertices_; ++i) {
+            if (vertices_[i] == v && uvs_[i] == uv) {
+                indexes_[numIndexes_++] = i;
+                return;
+            }
+        }
+        vertices_[numVertices_] = v;
+        uvs_[numVertices_++] = uv;
+        indexes_[numIndexes_++] = numVertices_ - 1;
+    }
+
 }

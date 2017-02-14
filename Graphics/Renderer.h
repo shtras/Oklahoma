@@ -2,6 +2,20 @@
 
 namespace OGraphics
 {
+    struct Vertex
+    {
+        GLfloat x, y, z;
+        bool operator== (const Vertex& other) const { return x == other.x && y == other.y && z == other.z; }
+    };
+    struct UV
+    {
+        GLfloat u, v;
+        bool operator== (const UV& other) const { return u == other.u && v == other.v; }
+    };
+    struct Rect
+    {
+        float top, left, width, height;
+    };
     class Shader
     {
     public:
@@ -31,22 +45,16 @@ namespace OGraphics
     {
         enum { POINTS_NUM = 2048 };
     public:
-        struct Vertex
-        {
-            GLfloat x, y, z;
-        };
-        struct UV
-        {
-            GLfloat u, v;
-        };
         Renderer();
         ~Renderer();
 
         void Prepare();
         void Render();
         void Init();
+        void DrawRect(Rect&& pos, Rect&& tex);
     private:
         void Cleanup();
+        void AddVertex(const Vertex&& v, const UV&& uv);
         SDL_Window* mainWindow_;
         SDL_GLContext mainGLContext_;
         Vertex vertices_[POINTS_NUM];
