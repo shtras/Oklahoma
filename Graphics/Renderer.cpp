@@ -150,7 +150,6 @@ namespace OGraphics
         mainGLContext_(nullptr),
         numVertices_(0),
         numIndexes_(0),
-        numUVs_(0),
         width_(1280),
         height_(720)
     {
@@ -165,10 +164,10 @@ namespace OGraphics
     void Renderer::Prepare()
     {
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer_);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVertices_, vertices_, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVertices_ * 3, vertices_, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, uvBuffer_);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numUVs_, uvs_, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVertices_ * 2, uvs_, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer_);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * numIndexes_, indexes_, GL_STATIC_DRAW);
@@ -254,28 +253,14 @@ namespace OGraphics
         glDepthFunc(GL_LESS);
         glEnable(GL_CULL_FACE);
 
-        vertices_[numVertices_++] = -1.0f;
-        vertices_[numVertices_++] = -1.0f;
-        vertices_[numVertices_++] = 0;
-        vertices_[numVertices_++] = 1.0f;
-        vertices_[numVertices_++] = -1.0f;
-        vertices_[numVertices_++] = 0;
-        vertices_[numVertices_++] = -1.0f;
-        vertices_[numVertices_++] = 1.0f;
-        vertices_[numVertices_++] = 0;
-        vertices_[numVertices_++] = 1.0f;
-        vertices_[numVertices_++] = 1.0f;
-        vertices_[numVertices_++] = 0;
-
-        uvs_[numUVs_++] = 0.2f;
-        uvs_[numUVs_++] = 0.2f;
-        uvs_[numUVs_++] = 0.8f;
-        uvs_[numUVs_++] = 0.2f;
-        uvs_[numUVs_++] = 0.2f;
-        uvs_[numUVs_++] = 0.8f;
-        uvs_[numUVs_++] = 0.8f;
-        uvs_[numUVs_++] = 0.8f;
-
+        vertices_[numVertices_] = { -1.0f, -1.0f, 0 };
+        uvs_[numVertices_++] = { 0.2f, 0.2f };
+        vertices_[numVertices_] = { 1.0f, -1.0f, 0 };
+        uvs_[numVertices_++] = { 0.8f, 0.2f };
+        vertices_[numVertices_] = { -1.0f, 1.0f, 0 };
+        uvs_[numVertices_++] = { 0.2f, 0.8f };
+        vertices_[numVertices_] = { 1.0f, 1.0f, 0 };
+        uvs_[numVertices_++] = { 0.8f, 0.8f };
         indexes_[numIndexes_++] = 0;
         indexes_[numIndexes_++] = 3;
         indexes_[numIndexes_++] = 1;

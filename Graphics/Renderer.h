@@ -31,6 +31,14 @@ namespace OGraphics
     {
         enum { POINTS_NUM = 2048 };
     public:
+        struct Vertex
+        {
+            GLfloat x, y, z;
+        };
+        struct UV
+        {
+            GLfloat u, v;
+        };
         Renderer();
         ~Renderer();
 
@@ -41,14 +49,13 @@ namespace OGraphics
         void Cleanup();
         SDL_Window* mainWindow_;
         SDL_GLContext mainGLContext_;
-        GLfloat vertices_[POINTS_NUM * 3];
-        GLfloat uvs_[POINTS_NUM * 2];
+        Vertex vertices_[POINTS_NUM];
+        UV uvs_[POINTS_NUM];
         GLushort indexes_[POINTS_NUM];
         GLuint vertexBuffer_;
         GLuint uvBuffer_;
         GLuint indexBuffer_;
         int numVertices_;
-        int numUVs_;
         int numIndexes_;
         int width_;
         int height_;
