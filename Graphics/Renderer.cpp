@@ -3,7 +3,7 @@
 
 namespace OGraphics
 {
-#define GLERR {GLenum e; if ((e = glGetError()) != GL_NO_ERROR) {LogError(L"%hs:%d - OpenGL error: %d", __FUNCTION__, __LINE__, e);assert(0);}}
+#define GLERR {GLenum e; if ((e = glGetError()) != GL_NO_ERROR) {LogError(L"%hs:%d - OpenGL error: %x", __FUNCTION__, __LINE__, e);assert(0);}}
     Shader::Shader() :
         programId_(0)
     {
@@ -106,12 +106,51 @@ namespace OGraphics
         return programId_;
     }
 
+    Texture::Texture():
+        textureID_(0)
+    {
+
+    }
+
+    Texture::~Texture()
+    {
+        if (textureID_ > 0) {
+            glDeleteTextures(1, &textureID_);
+        }
+    }
+
+    void Texture::Load(const char* path)
+    {
+        SDL_Surface* fontSurf = IMG_Load(path);
+        if (!fontSurf) {
+            LogError(L"Failed to load file: %hs", path);
+            return;
+        }
+        glGenTextures(1, &textureID_);
+        glBindTexture(GL_TEXTURE_2D, textureID_);
+        int mode = GL_RGB;
+        if (fontSurf->format->BytesPerPixel == 4) {
+            mode = GL_RGBA;
+        }
+        width_ = fontSurf->w;
+        height_ = fontSurf->h;
+        glTexImage2D(GL_TEXTURE_2D, 0, mode, fontSurf->w, fontSurf->h, 0, mode, GL_UNSIGNED_BYTE, fontSurf->pixels);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        GLERR
+    }
+
+    const GLuint Texture::GetTextureID() const
+    {
+        return textureID_;
+    }
+
     Renderer::Renderer() :
         mainWindow_(nullptr),
         mainGLContext_(nullptr),
         numVertices_(0),
         numIndexes_(0),
-        numColors_(0),
+        numUVs_(0),
         width_(1280),
         height_(720)
     {
@@ -127,8 +166,10 @@ namespace OGraphics
     {
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer_);
         glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVertices_, vertices_, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, colorBuffer_);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numColors_, colors_, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, uvBuffer_);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numUVs_, uvs_, GL_STATIC_DRAW);
+
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer_);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * numIndexes_, indexes_, GL_STATIC_DRAW);
     }
@@ -136,9 +177,16 @@ namespace OGraphics
     void Renderer::Render()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GLuint matrixID = glGetUniformLocation(shader_->GetProgramId(), "MVP");
-        glUseProgram(shader_->GetProgramId());
-        glUniformMatrix4fv(matrixID, 1, GL_FALSE, &mvp_[0][0]);
+        GLuint programID = shader_->GetProgramId();
+        GLuint textureID = texture_->GetTextureID();
+        GLuint matrixLocation = glGetUniformLocation(programID, "MVP");
+        GLuint textureLocation = glGetUniformLocation(programID, "sampler");
+        glUseProgram(programID);
+        glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, &mvp_[0][0]);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glUniform1i(textureLocation, 0);
 
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer_);
@@ -152,14 +200,14 @@ namespace OGraphics
         );
 
         glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, colorBuffer_);
+        glBindBuffer(GL_ARRAY_BUFFER, uvBuffer_);
         glVertexAttribPointer(
-            1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-            3,                  // size
-            GL_FLOAT,           // type
-            GL_FALSE,           // normalized?
-            0,                  // stride
-            (void*)0            // array buffer offset
+            1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+            2,                                // size : U+V => 2
+            GL_FLOAT,                         // type
+            GL_FALSE,                         // normalized?
+            0,                                // stride
+            (void*)0                          // array buffer offset
         );
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer_);
@@ -169,7 +217,7 @@ namespace OGraphics
             GL_UNSIGNED_SHORT,   // type
             (void*)0           // element array buffer offset
         );
-        
+        GLERR
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         
@@ -192,11 +240,14 @@ namespace OGraphics
         glm::mat4 View = glm::lookAt(glm::vec3(0, 3, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
         glm::mat4 Model = glm::mat4(1.0f);
         mvp_ = Projection * View * Model;
-         shader_ = new Shader();
-         shader_->Load(L"Shaders\\vert.glsl", L"Shaders\\frag.glsl");
+        shader_ = new Shader();
+        shader_->Load(L"Shaders\\vert.glsl", L"Shaders\\frag.glsl");
+
+        texture_ = new Texture();
+        texture_->Load("Textures\\test.png");
 
         glGenBuffers(1, &vertexBuffer_);
-        glGenBuffers(1, &colorBuffer_);
+        glGenBuffers(1, &uvBuffer_);
         glGenBuffers(1, &indexBuffer_);
 
         glEnable(GL_DEPTH_TEST);
@@ -216,18 +267,14 @@ namespace OGraphics
         vertices_[numVertices_++] = 1.0f;
         vertices_[numVertices_++] = 0;
 
-        colors_[numColors_++] = 1.0f;
-        colors_[numColors_++] = 0;
-        colors_[numColors_++] = 0;
-        colors_[numColors_++] = 1.0f;
-        colors_[numColors_++] = 1.0f;
-        colors_[numColors_++] = 0;
-        colors_[numColors_++] = 1.0f;
-        colors_[numColors_++] = 1.0f;
-        colors_[numColors_++] = 1.0f;
-        colors_[numColors_++] = 0;
-        colors_[numColors_++] = 1.0f;
-        colors_[numColors_++] = 1.0f;
+        uvs_[numUVs_++] = 0.2f;
+        uvs_[numUVs_++] = 0.2f;
+        uvs_[numUVs_++] = 0.8f;
+        uvs_[numUVs_++] = 0.2f;
+        uvs_[numUVs_++] = 0.2f;
+        uvs_[numUVs_++] = 0.8f;
+        uvs_[numUVs_++] = 0.8f;
+        uvs_[numUVs_++] = 0.8f;
 
         indexes_[numIndexes_++] = 0;
         indexes_[numIndexes_++] = 3;
@@ -240,10 +287,9 @@ namespace OGraphics
     void Renderer::Cleanup()
     {
         glDeleteBuffers(1, &vertexBuffer_);
-        glDeleteBuffers(1, &colorBuffer_);
+        glDeleteBuffers(1, &uvBuffer_);
         glDeleteBuffers(1, &indexBuffer_);
         SDL_GL_DeleteContext(mainGLContext_);
         SDL_DestroyWindow(mainWindow_);
     }
-
 }

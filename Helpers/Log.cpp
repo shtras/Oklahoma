@@ -32,6 +32,7 @@ namespace ODiagnostics
         fwprintf_s(file_, L"%ls\n", logLine);
 #ifdef DEBUG
         std::wcout << logLine;
+        std::wcout.flush();
 #endif
 
     }
