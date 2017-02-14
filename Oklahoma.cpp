@@ -16,7 +16,7 @@ int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance
     Oklahoma& oklahoma = Oklahoma::GetInstance();
     oklahoma.Init();
     oklahoma.Run();
-    LogInfo(L"Bye.");
+    LogInfo(L"Bye.\n\n");
 
 #ifdef DEBUG
     FreeConsole();
