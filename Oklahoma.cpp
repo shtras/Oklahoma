@@ -2,6 +2,8 @@
 #include "Oklahoma.h"
 #include "Version.h"
 
+using namespace OGraphics;
+
 int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd)
 {
 #ifdef DEBUG
@@ -41,21 +43,22 @@ void Oklahoma::Run()
                 running_ = false;
                 break;
             }
-            
         }
-
-        renderer_->DrawRect({ -1.0f, -1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+        renderer_->StartFrame();
+        renderer_->SetTexture(Renderer::TEX_FONT);
         renderer_->DrawRect({ 0.0f, 0.0f, 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f });
 
-        renderer_->Render();
+        renderer_->SetTexture(Renderer::TEX_GUI);
+        renderer_->DrawRect({ -1.0f, -1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+
+        renderer_->RenderFrame();
     }
 }
 
 void Oklahoma::Init()
 {
-    renderer_ = new OGraphics::Renderer();
+    renderer_ = new Renderer();
     renderer_->Init();
-    renderer_->SetTexture(OGraphics::Renderer::TEX_GUI);
 }
 
 Oklahoma::Oklahoma() :

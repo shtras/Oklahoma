@@ -137,7 +137,7 @@ namespace OGraphics
         glTexImage2D(GL_TEXTURE_2D, 0, mode, fontSurf->w, fontSurf->h, 0, mode, GL_UNSIGNED_BYTE, fontSurf->pixels);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        GLERR
+        GLERR;
     }
 
     const GLuint Texture::GetTextureID() const
@@ -161,10 +161,13 @@ namespace OGraphics
         Destroy();
     }
 
-    void Renderer::Render()
+    void Renderer::StartFrame()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
 
+    void Renderer::RenderFrame()
+    {
         if (numVertices_ > 0) {
             FLush();
         }
@@ -195,7 +198,6 @@ namespace OGraphics
         glUseProgram(programID);
         glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, &mvp_[0][0]);
 
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureID);
         glUniform1i(textureLocation, 0);
 
@@ -236,9 +238,8 @@ namespace OGraphics
         shaders_[SHADER_DEFAULT] = shader;
         SetShader(SHADER_DEFAULT);
 
-        SmartPtr<Texture> texture = new Texture();
-        texture->Load("Textures\\test.png");
-        textures_[TEX_GUI] = texture;
+        LoadTexture("Textures\\test.png", TEX_GUI);
+        LoadTexture("Textures\\test1.png", TEX_FONT);
 
         glGenBuffers(1, &vertexBuffer_);
         glGenBuffers(1, &uvBuffer_);
@@ -247,6 +248,7 @@ namespace OGraphics
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
         glEnable(GL_CULL_FACE);
+        glActiveTexture(GL_TEXTURE0);
     }
 
     void Renderer::DrawRect(Rect&& pos, Rect&& tex)
@@ -308,4 +310,12 @@ namespace OGraphics
         numVertices_ = 0;
         numIndexes_ = 0;
     }
+
+    void Renderer::LoadTexture(const char* path, TextureType type)
+    {
+        SmartPtr<Texture> texture = new Texture();
+        texture->Load(path);
+        textures_[type] = texture;
+    }
+
 }

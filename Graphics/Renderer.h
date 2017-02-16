@@ -51,7 +51,8 @@ namespace OGraphics
         Renderer();
         ~Renderer();
 
-        void Render();
+        void StartFrame();
+        void RenderFrame();
         void Init();
         void DrawRect(Rect&& pos, Rect&& tex);
         void SetTexture(TextureType tex);
@@ -61,6 +62,7 @@ namespace OGraphics
         void Destroy();
         void AddVertex(const Vertex&& v, const UV&& uv);
         void Clear();
+        void LoadTexture(const char* path, TextureType type);
         SDL_Window* mainWindow_;
         SDL_GLContext mainGLContext_;
         Vertex vertices_[POINTS_NUM];
