@@ -45,16 +45,22 @@ namespace OGraphics
     {
         enum { POINTS_NUM = 2048 };
     public:
+        enum TextureType { TEX_GUI, TEX_FONT };
+        enum ShaderType { SHADER_DEFAULT };
+
         Renderer();
         ~Renderer();
 
-        void Prepare();
         void Render();
         void Init();
         void DrawRect(Rect&& pos, Rect&& tex);
+        void SetTexture(TextureType tex);
+        void SetShader(ShaderType shader);
     private:
-        void Cleanup();
+        void FLush();
+        void Destroy();
         void AddVertex(const Vertex&& v, const UV&& uv);
+        void Clear();
         SDL_Window* mainWindow_;
         SDL_GLContext mainGLContext_;
         Vertex vertices_[POINTS_NUM];
@@ -71,5 +77,7 @@ namespace OGraphics
         glm::mat4 mvp_;
         SmartPtr<Shader> shader_;
         SmartPtr<Texture> texture_;
+        map<TextureType, SmartPtr<Texture>> textures_;
+        map<ShaderType, SmartPtr<Shader>> shaders_;
     };
 }

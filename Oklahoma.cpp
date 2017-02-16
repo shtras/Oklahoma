@@ -43,7 +43,10 @@ void Oklahoma::Run()
             }
             
         }
-        renderer_->Prepare();
+
+        renderer_->DrawRect({ -1.0f, -1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+        renderer_->DrawRect({ 0.0f, 0.0f, 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+
         renderer_->Render();
     }
 }
@@ -52,6 +55,7 @@ void Oklahoma::Init()
 {
     renderer_ = new OGraphics::Renderer();
     renderer_->Init();
+    renderer_->SetTexture(OGraphics::Renderer::TEX_GUI);
 }
 
 Oklahoma::Oklahoma() :

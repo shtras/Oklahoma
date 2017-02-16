@@ -158,11 +158,27 @@ namespace OGraphics
 
     Renderer::~Renderer()
     {
-        Cleanup();
+        Destroy();
     }
 
-    void Renderer::Prepare()
+    void Renderer::Render()
     {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        if (numVertices_ > 0) {
+            FLush();
+        }
+       
+        SDL_GL_SwapWindow(mainWindow_);
+        GLERR;
+        Clear();
+    }
+
+    void Renderer::FLush()
+    {
+        if (numIndexes_ == 0) {
+            return;
+        }
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer_);
         glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVertices_ * 3, vertices_, GL_STATIC_DRAW);
 
@@ -171,11 +187,7 @@ namespace OGraphics
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer_);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * numIndexes_, indexes_, GL_STATIC_DRAW);
-    }
 
-    void Renderer::Render()
-    {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GLuint programID = shader_->GetProgramId();
         GLuint textureID = texture_->GetTextureID();
         GLuint matrixLocation = glGetUniformLocation(programID, "MVP");
@@ -189,47 +201,27 @@ namespace OGraphics
 
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer_);
-        glVertexAttribPointer(
-            0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-            3,                  // size
-            GL_FLOAT,           // type
-            GL_FALSE,           // normalized?
-            0,                  // stride
-            (void*)0            // array buffer offset
-        );
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
         glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, uvBuffer_);
-        glVertexAttribPointer(
-            1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-            2,                                // size : U+V => 2
-            GL_FLOAT,                         // type
-            GL_FALSE,                         // normalized?
-            0,                                // stride
-            (void*)0                          // array buffer offset
-        );
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer_);
-        glDrawElements(
-            GL_TRIANGLES,      // mode
-            numIndexes_,    // count
-            GL_UNSIGNED_SHORT,   // type
-            (void*)0           // element array buffer offset
-        );
-        GLERR
+        glDrawElements(GL_TRIANGLES, numIndexes_, GL_UNSIGNED_SHORT, NULL);
+        GLERR;
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
-        
-        SDL_GL_SwapWindow(mainWindow_);
-        GLERR
+
+        numVertices_ = 0;
+        numIndexes_ = 0;
     }
 
     void Renderer::Init()
     {
         Uint32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
-        mainWindow_ = SDL_CreateWindow("SDL2 OpenGL Example", SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED, width_, height_, flags);
+        mainWindow_ = SDL_CreateWindow("SDL2 OpenGL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width_, height_, flags);
         mainGLContext_ = SDL_GL_CreateContext(mainWindow_);
         glewInit();
 
@@ -239,11 +231,14 @@ namespace OGraphics
         glm::mat4 View = glm::lookAt(glm::vec3(0, 0, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
         glm::mat4 Model = glm::mat4(1.0f);
         mvp_ = Projection * View * Model;
-        shader_ = new Shader();
-        shader_->Load(L"Shaders\\vert.glsl", L"Shaders\\frag.glsl");
+        SmartPtr<Shader> shader = new Shader();
+        shader->Load(L"Shaders\\vert.glsl", L"Shaders\\frag.glsl");
+        shaders_[SHADER_DEFAULT] = shader;
+        SetShader(SHADER_DEFAULT);
 
-        texture_ = new Texture();
-        texture_->Load("Textures\\test.png");
+        SmartPtr<Texture> texture = new Texture();
+        texture->Load("Textures\\test.png");
+        textures_[TEX_GUI] = texture;
 
         glGenBuffers(1, &vertexBuffer_);
         glGenBuffers(1, &uvBuffer_);
@@ -252,13 +247,13 @@ namespace OGraphics
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
         glEnable(GL_CULL_FACE);
-
-        DrawRect({ -1.0f, -1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
-        DrawRect({ 0.0f, 0.0f, 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f });
     }
 
     void Renderer::DrawRect(Rect&& pos, Rect&& tex)
     {
+        if (numIndexes_ >= POINTS_NUM - 6) {
+            FLush();
+        }
         AddVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
         AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
         AddVertex({ pos.left + pos.width, pos.top, 0 }, { tex.left + tex.width, tex.top });
@@ -268,7 +263,25 @@ namespace OGraphics
         AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
     }
 
-    void Renderer::Cleanup()
+    void Renderer::SetTexture(TextureType tex)
+    {
+        if (texture_ == textures_[tex]) {
+            return;
+        }
+        FLush();
+        texture_ = textures_[tex];
+    }
+
+    void Renderer::SetShader(ShaderType shader)
+    {
+        if (shader_ == shaders_[shader]) {
+            return;
+        }
+        FLush();
+        shader_ = shaders_[shader];
+    }
+
+    void Renderer::Destroy()
     {
         glDeleteBuffers(1, &vertexBuffer_);
         glDeleteBuffers(1, &uvBuffer_);
@@ -290,4 +303,9 @@ namespace OGraphics
         indexes_[numIndexes_++] = numVertices_ - 1;
     }
 
+    void Renderer::Clear()
+    {
+        numVertices_ = 0;
+        numIndexes_ = 0;
+    }
 }

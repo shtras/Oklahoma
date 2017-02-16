@@ -41,9 +41,9 @@ public:
 
     }
     SmartPtr(T* data):
-        inner_(new InnerPtr(data))
+        inner_(new InnerPtr<T>(data))
     {
-
+        AddRef();
     }
     SmartPtr(SmartPtr<T>& other):
         inner_(other.inner_)
@@ -84,6 +84,11 @@ public:
     T* operator -> ()
     {
         return inner_->data_;
+    }
+
+    bool operator == (SmartPtr<T>& other) const
+    {
+        return inner_ == other.inner_;
     }
 private:
     InnerPtr<T>* inner_;

@@ -6,6 +6,9 @@
 #include <string>
 #include <assert.h>
 #include <vector>
+#include <map>
+
+using namespace std;
 
 #include <SDL.h>
 #include <SDL_image.h>
