@@ -45,11 +45,15 @@ void Oklahoma::Run()
             }
         }
         renderer_->StartFrame();
-        renderer_->SetTexture(Renderer::TEX_FONT);
-        renderer_->DrawRect({ 0.0f, 0.0f, 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f, 1.0f });
 
-        renderer_->SetTexture(Renderer::TEX_GUI);
-        renderer_->DrawRect({ -1.0f, -1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+        //renderer_->SetTexture(Renderer::TEX_GUI);
+        //renderer_->RenderRect(Rect({ 0.0f, 0.0f, 0.5f, 0.5f }), Rect({ 0.0f, 0.0f, 1.0f, 1.0f }));
+        //renderer_->RenderRect(Rect({ 0.5f, 0.0f, 0.3f, 0.3f }), Rect({ 0.0f, 0.0f, 0.5f, 0.5f }));
+
+        renderer_->RenderText(L"abcdefghijklmnopqrstuvwxyz", 0, 0);
+        renderer_->RenderText(L"ABCDEFGHIJKLMNOPQRSTUVWXYZ", 0, 0.3f);
+        renderer_->RenderText(L"0123456789/", 0, 0.5f);
+        renderer_->RenderText(L"!@#$%^&*()-=_+,.;:'\"[]{}\\|", 0, 0.7f);
 
         renderer_->RenderFrame();
     }

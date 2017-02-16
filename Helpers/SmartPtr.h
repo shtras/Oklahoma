@@ -79,6 +79,9 @@ public:
     }
     operator T* ()
     {
+        if (!inner_) {
+            return nullptr;
+        }
         return inner_->data_;
     }
     T* operator -> ()

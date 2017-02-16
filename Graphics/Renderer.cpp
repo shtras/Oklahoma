@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "Renderer.h"
+#include "Version.h"
 
 namespace OGraphics
 {
@@ -145,6 +146,16 @@ namespace OGraphics
         return textureID_;
     }
 
+    const int Texture::GetWidth() const
+    {
+        return width_;
+    }
+
+    const int Texture::GetHeight() const
+    {
+        return height_;
+    }
+
     Renderer::Renderer() :
         mainWindow_(nullptr),
         mainGLContext_(nullptr),
@@ -175,6 +186,47 @@ namespace OGraphics
         SDL_GL_SwapWindow(mainWindow_);
         GLERR;
         Clear();
+    }
+
+    void Renderer::Init()
+    {
+        SDL_Init(SDL_INIT_EVERYTHING);
+        IMG_Init(IMG_INIT_PNG);
+        Uint32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
+
+        char title[128];
+        sprintf_s(title, "Oklahoma %d.%d.%d", Version::MAJOR, Version::MINOR, Version::REVISION);
+
+        mainWindow_ = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width_, height_, flags);
+        mainGLContext_ = SDL_GL_CreateContext(mainWindow_);
+        glewInit();
+
+        glViewport(0, 0, width_, height_);
+        
+        //glm::mat4 Projection = glm::perspective(glm::radians(-45.0f), (float)width_ / (float)height_, 0.1f, 100.0f);
+        glm::mat4 Projection = glm::ortho(0.0f, 1.0f, 1.0f, 0.0f, -5.0f, 5.0f);
+        glm::mat4 View = glm::lookAt(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        glm::mat4 Model = glm::mat4(1.0f);
+        mvp_ = Projection;// *View * Model;
+        LoadShader(L"Shaders\\vert.glsl", L"Shaders\\frag.glsl", SHADER_DEFAULT);
+        SetShader(SHADER_DEFAULT);
+
+        LoadTexture("Textures\\test.png", TEX_GUI);
+        LoadTexture("Textures\\Font.png", TEX_FONT);
+        InitTextUVs();
+
+        SetCharSize(15, 20);
+
+        glGenBuffers(1, &vertexBuffer_);
+        glGenBuffers(1, &uvBuffer_);
+        glGenBuffers(1, &indexBuffer_);
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glActiveTexture(GL_TEXTURE0);
     }
 
     void Renderer::FLush()
@@ -219,39 +271,7 @@ namespace OGraphics
         numIndexes_ = 0;
     }
 
-    void Renderer::Init()
-    {
-        Uint32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
-
-        mainWindow_ = SDL_CreateWindow("SDL2 OpenGL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width_, height_, flags);
-        mainGLContext_ = SDL_GL_CreateContext(mainWindow_);
-        glewInit();
-
-        glViewport(0, 0, width_, height_);
-
-        glm::mat4 Projection = glm::perspective(glm::radians(-45.0f), (float)width_ / (float)height_, 0.1f, 100.0f);
-        glm::mat4 View = glm::lookAt(glm::vec3(0, 0, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-        glm::mat4 Model = glm::mat4(1.0f);
-        mvp_ = Projection * View * Model;
-        SmartPtr<Shader> shader = new Shader();
-        shader->Load(L"Shaders\\vert.glsl", L"Shaders\\frag.glsl");
-        shaders_[SHADER_DEFAULT] = shader;
-        SetShader(SHADER_DEFAULT);
-
-        LoadTexture("Textures\\test.png", TEX_GUI);
-        LoadTexture("Textures\\test1.png", TEX_FONT);
-
-        glGenBuffers(1, &vertexBuffer_);
-        glGenBuffers(1, &uvBuffer_);
-        glGenBuffers(1, &indexBuffer_);
-
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glEnable(GL_CULL_FACE);
-        glActiveTexture(GL_TEXTURE0);
-    }
-
-    void Renderer::DrawRect(Rect&& pos, Rect&& tex)
+    void Renderer::RenderRect(Rect& pos, Rect& tex)
     {
         if (numIndexes_ >= POINTS_NUM - 6) {
             FLush();
@@ -263,6 +283,20 @@ namespace OGraphics
         AddVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
         AddVertex({ pos.left, pos.top + pos.height, 0 }, { tex.left, tex.top + tex.height });
         AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
+    }
+
+    void Renderer::RenderText(const wchar_t* text, float x, float y)
+    {
+        SetTexture(TEX_FONT);
+        size_t len = wcslen(text);
+        for (int i = 0; i < len; ++i) {
+            wchar_t c = text[i];
+            if (textUVs_.count(c) == 0) {
+                c = ' ';
+            }
+            Rect& uv = textUVs_[c];
+            RenderRect(Rect({ x + i*charWidth_, y, charWidth_, charHeight_ }), uv);
+        }
     }
 
     void Renderer::SetTexture(TextureType tex)
@@ -283,6 +317,12 @@ namespace OGraphics
         shader_ = shaders_[shader];
     }
 
+    void Renderer::SetCharSize(int width, int height)
+    {
+        charWidth_ = width / (float)width_;
+        charHeight_ = height / (float)height_;
+    }
+
     void Renderer::Destroy()
     {
         glDeleteBuffers(1, &vertexBuffer_);
@@ -292,8 +332,12 @@ namespace OGraphics
         SDL_DestroyWindow(mainWindow_);
     }
 
-    void Renderer::AddVertex(const Vertex&& v, const UV&& uv)
+    void Renderer::AddVertex(const Vertex& v, const UV& uv)
     {
+        if (!texture_) {
+            LogError(L"No active texture");
+            assert(0);
+        }
         for (int i = 0; i < numVertices_; ++i) {
             if (vertices_[i] == v && uvs_[i] == uv) {
                 indexes_[numIndexes_++] = i;
@@ -316,6 +360,29 @@ namespace OGraphics
         SmartPtr<Texture> texture = new Texture();
         texture->Load(path);
         textures_[type] = texture;
+    }
+
+    void Renderer::LoadShader(const wchar_t* vert, const wchar_t* frag, ShaderType type)
+    {
+        SmartPtr<Shader> shader = new Shader();
+        shader->Load(vert, frag);
+        shaders_[type] = shader;
+    }
+
+    void Renderer::InitTextUVs()
+    {
+        int charWidth = 19;
+        int charHeight = 41;
+        int texWidth = textures_[TEX_FONT]->GetWidth();
+        int texHeight = textures_[TEX_FONT]->GetHeight();
+        float fCharWidth = charWidth / (float)texWidth;
+        float fCharHeight = charHeight / (float)texHeight;
+        for (wchar_t x = 0; x <= 26; ++x) {
+            textUVs_[L"abcdefghijklmnopqrstuvwxyz"[x]] = { x * fCharWidth, 0,              fCharWidth, fCharHeight };
+            textUVs_[L"ABCDEFGHIJKLMNOPQRSTUVWXYZ"[x]] = { x * fCharWidth, fCharHeight,     fCharWidth, fCharHeight };
+            textUVs_[L"0123456789/               "[x]] = { x * fCharWidth, 2 * fCharHeight, fCharWidth, fCharHeight };
+            textUVs_[L"!@#$%^&*()-=_+,.;:'\"[]{}\\|"[x]] = { x * fCharWidth, 3 * fCharHeight, fCharWidth, fCharHeight };
+        }
     }
 
 }

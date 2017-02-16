@@ -14,7 +14,7 @@ namespace OGraphics
     };
     struct Rect
     {
-        float top, left, width, height;
+        float left, top, width, height;
     };
     class Shader
     {
@@ -35,6 +35,8 @@ namespace OGraphics
         ~Texture();
         void Load(const char* path);
         const GLuint GetTextureID() const;
+        const int GetWidth() const;
+        const int GetHeight() const;
     private:
         GLuint textureID_;
         int width_;
@@ -45,7 +47,7 @@ namespace OGraphics
     {
         enum { POINTS_NUM = 2048 };
     public:
-        enum TextureType { TEX_GUI, TEX_FONT };
+        enum TextureType { TEX_NONE, TEX_GUI, TEX_FONT };
         enum ShaderType { SHADER_DEFAULT };
 
         Renderer();
@@ -54,15 +56,19 @@ namespace OGraphics
         void StartFrame();
         void RenderFrame();
         void Init();
-        void DrawRect(Rect&& pos, Rect&& tex);
+        void RenderRect(Rect& pos, Rect& tex);
+        void RenderText(const wchar_t* text, float x, float y);
         void SetTexture(TextureType tex);
         void SetShader(ShaderType shader);
+        void SetCharSize(int width, int height);
     private:
         void FLush();
         void Destroy();
-        void AddVertex(const Vertex&& v, const UV&& uv);
+        void AddVertex(const Vertex& v, const UV& uv);
         void Clear();
         void LoadTexture(const char* path, TextureType type);
+        void LoadShader(const wchar_t* vert, const wchar_t* frag, ShaderType type);
+        void InitTextUVs();
         SDL_Window* mainWindow_;
         SDL_GLContext mainGLContext_;
         Vertex vertices_[POINTS_NUM];
@@ -75,11 +81,14 @@ namespace OGraphics
         int numIndexes_;
         int width_;
         int height_;
+        float charWidth_;
+        float charHeight_;
 
         glm::mat4 mvp_;
         SmartPtr<Shader> shader_;
         SmartPtr<Texture> texture_;
         map<TextureType, SmartPtr<Texture>> textures_;
         map<ShaderType, SmartPtr<Shader>> shaders_;
+        map<wchar_t, Rect> textUVs_;
     };
 }
