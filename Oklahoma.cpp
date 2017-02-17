@@ -3,6 +3,7 @@
 #include "Version.h"
 
 using namespace OGraphics;
+using namespace OGUI;
 
 int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd)
 {
@@ -62,9 +63,9 @@ void Oklahoma::Run()
 
         renderer_->StartFrame();
 
-        //renderer_->SetTexture(Renderer::TEX_GUI);
-        //renderer_->RenderRect(Rect({ 0.0f, 0.0f, 0.5f, 0.5f }), Rect({ 0.0f, 0.0f, 1.0f, 1.0f }));
-        //renderer_->RenderRect(Rect({ 0.5f, 0.0f, 0.3f, 0.3f }), Rect({ 0.0f, 0.0f, 0.5f, 0.5f }));
+        renderer_->SetTexture(Renderer::TEX_GUI);
+        renderer_->RenderRect(Rect({ 0.0f, 0.0f, 0.5f, 0.5f }), Rect({ 0.0f, 0.0f, 1.0f, 1.0f }));
+        renderer_->RenderRect(Rect({ 0.5f, 0.0f, 0.3f, 0.3f }), Rect({ 0.0f, 0.0f, 0.5f, 0.5f }));
         renderer_->RenderText(L"abcdefghijklmnopqrstuvwxyz", 0, 0);
         renderer_->RenderText(L"ABCDEFGHIJKLMNOPQRSTUVWXYZ", 0, 0.3f);
         renderer_->RenderText(L"0123456789/", 0, 0.5f);

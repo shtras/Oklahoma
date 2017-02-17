@@ -28,6 +28,12 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{88f4cc2b-fe84-478c-9043-919345947857}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{efa02dce-72c8-42d4-8369-2290203a43c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GUI">
+      <UniqueIdentifier>{fe184ddb-a470-4c41-83b1-3c5bf79393f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Oklahoma.cpp">
@@ -47,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="Helpers\helpers.cpp">
       <Filter>Source Files\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Widget.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="Version.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Widget.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

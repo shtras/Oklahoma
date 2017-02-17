@@ -211,7 +211,7 @@ namespace OGraphics
         LoadShader(L"Shaders\\vert.glsl", L"Shaders\\frag.glsl", SHADER_DEFAULT);
         SetShader(SHADER_DEFAULT);
 
-        LoadTexture("Textures\\test.png", TEX_GUI);
+        LoadTexture("Textures\\gui0.png", TEX_GUI);
         LoadTexture("Textures\\Font.png", TEX_FONT);
         InitTextUVs();
 
