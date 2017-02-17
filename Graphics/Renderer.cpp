@@ -377,11 +377,22 @@ namespace OGraphics
         int texHeight = textures_[TEX_FONT]->GetHeight();
         float fCharWidth = charWidth / (float)texWidth;
         float fCharHeight = charHeight / (float)texHeight;
-        for (wchar_t x = 0; x <= 26; ++x) {
-            textUVs_[L"abcdefghijklmnopqrstuvwxyz"[x]] = { x * fCharWidth, 0,              fCharWidth, fCharHeight };
-            textUVs_[L"ABCDEFGHIJKLMNOPQRSTUVWXYZ"[x]] = { x * fCharWidth, fCharHeight,     fCharWidth, fCharHeight };
-            textUVs_[L"0123456789/               "[x]] = { x * fCharWidth, 2 * fCharHeight, fCharWidth, fCharHeight };
-            textUVs_[L"!@#$%^&*()-=_+,.;:'\"[]{}\\|"[x]] = { x * fCharWidth, 3 * fCharHeight, fCharWidth, fCharHeight };
+        wifstream f(L"Textures\\font.txt", ios::in);
+        if (!f.is_open()) {
+            LogError(L"Failed to open characters file");
+            return;
+        }
+        vector<wstring> fontLines;
+        wstring s;
+        while (getline(f, s)) {
+            fontLines.push_back(s);
+        }
+        f.close();
+        for (int i = 0; i < fontLines.size(); ++i) {
+            wstring& sitr = fontLines[i];
+            for (int x = 0; x <= sitr.size(); ++x) {
+                textUVs_[sitr[x]] = { x * fCharWidth, i * fCharHeight, fCharWidth, fCharHeight };
+            }
         }
     }
 
