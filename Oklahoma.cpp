@@ -1,8 +1,10 @@
 #include "StdAfx.h"
 #include "Oklahoma.h"
 #include "Version.h"
+#include "Widget.h"
 
 using namespace OGraphics;
+using namespace OGUI;
 
 int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd)
 {
@@ -38,7 +40,9 @@ void Oklahoma::Run()
     int fpsTickBase = lastTicks;
     int frames = 0;
     wchar_t fpsStr[128];
-
+    Renderer& renderer = Renderer::GetInstance();
+    SmartPtr<Widget> w = new Widget({ 0.1f, 0.1f, 0.8f, 0.8f }, { 31, 47, 321, 338, 29, 47, 210, 237 });
+    SmartPtr<Widget> w1 = new Widget({ 0.3f, 0.3f, 0.8f, 0.8f }, { 31, 47, 321, 338, 29, 47, 210, 237 });
     while (running_) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -60,25 +64,22 @@ void Oklahoma::Run()
             swprintf_s(fpsStr, L"FPS: %.2f", fps);
         }
 
-        renderer_->StartFrame();
+        renderer.StartFrame();
+        renderer.SetTexture(Renderer::TEX_TEST);
+        renderer.RenderRect({ 0.0f, 0.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
+        w->Render();
+        w1->Render();
+        renderer.RenderText(fpsStr, 0, 0.9f);
 
-        renderer_->SetTexture(Renderer::TEX_GUI);
-        renderer_->RenderRect(Rect({ 0.0f, 0.0f, 0.5f, 0.5f }), Rect({ 0.0f, 0.0f, 1.0f, 1.0f }));
-        renderer_->RenderRect(Rect({ 0.5f, 0.0f, 0.3f, 0.3f }), Rect({ 0.0f, 0.0f, 0.5f, 0.5f }));
-        renderer_->RenderText(L"abcdefghijklmnopqrstuvwxyz", 0, 0);
-        renderer_->RenderText(L"ABCDEFGHIJKLMNOPQRSTUVWXYZ", 0, 0.3f);
-        renderer_->RenderText(L"0123456789/", 0, 0.5f);
-        renderer_->RenderText(L"!@#$%^&*()-=_+,.;:'\"[]{}\\|", 0, 0.7f);
-        renderer_->RenderText(fpsStr, 0, 0.9f);
-        renderer_->RenderFrame();
+        renderer.RenderFrame();
     }
 }
 
 void Oklahoma::Init()
 {
-    renderer_ = new Renderer();
-    renderer_->Init();
-    renderer_->SetCharSize(20, 40);
+    Renderer& renderer = Renderer::GetInstance();
+    renderer.Init();
+    renderer.SetCharSize(20, 40);
 }
 
 Oklahoma::Oklahoma() :

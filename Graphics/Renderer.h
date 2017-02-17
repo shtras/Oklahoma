@@ -1,21 +1,9 @@
 #pragma once
+#include "GUIInterface.h"
+using namespace OGUI;
 
 namespace OGraphics
 {
-    struct Vertex
-    {
-        GLfloat x, y, z;
-        bool operator== (const Vertex& other) const { return x == other.x && y == other.y && z == other.z; }
-    };
-    struct UV
-    {
-        GLfloat u, v;
-        bool operator== (const UV& other) const { return u == other.u && v == other.v; }
-    };
-    struct Rect
-    {
-        float left, top, width, height;
-    };
     class Shader
     {
     public:
@@ -47,21 +35,23 @@ namespace OGraphics
     {
         enum { POINTS_NUM = 2048 };
     public:
-        enum TextureType { TEX_NONE, TEX_GUI, TEX_FONT };
+        enum TextureType { TEX_NONE, TEX_GUI, TEX_FONT, TEX_TEST };
         enum ShaderType { SHADER_DEFAULT };
-
-        Renderer();
-        ~Renderer();
-
+        static Renderer& GetInstance();
         void StartFrame();
         void RenderFrame();
         void Init();
-        void RenderRect(Rect& pos, Rect& tex);
+        void RenderRect(const Rect& pos, const Rect& tex);
+        void RenderRect(Rect&& pos, Rect&& tex);
         void RenderText(const wchar_t* text, float x, float y);
         void SetTexture(TextureType tex);
         void SetShader(ShaderType shader);
         void SetCharSize(int width, int height);
+        void InitWidgetTex(const Rect& pos, const TexturePos& texPos, WidgetRects& uvs, WidgetRects& rects);
     private:
+        Renderer();
+        Renderer(const Renderer& other);
+        ~Renderer();
         void FLush();
         void Destroy();
         void AddVertex(const Vertex& v, const UV& uv);

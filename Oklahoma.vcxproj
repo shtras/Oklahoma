@@ -102,7 +102,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>DEBUG;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.;SDL;Graphics;Helpers</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;SDL;Graphics;Helpers;GUI</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,7 +141,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.;SDL;Graphics;Helpers</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;SDL;Graphics;Helpers;GUI</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -169,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\Renderer.h" />
+    <ClInclude Include="GUI\GUIInterface.h" />
     <ClInclude Include="GUI\Widget.h" />
     <ClInclude Include="Helpers\helpers.h" />
     <ClInclude Include="Helpers\Log.h" />

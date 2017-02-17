@@ -172,6 +172,12 @@ namespace OGraphics
         Destroy();
     }
 
+    Renderer& Renderer::GetInstance()
+    {
+        static Renderer instance;
+        return instance;
+    }
+
     void Renderer::StartFrame()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -213,6 +219,7 @@ namespace OGraphics
 
         LoadTexture("Textures\\gui0.png", TEX_GUI);
         LoadTexture("Textures\\Font.png", TEX_FONT);
+        LoadTexture("Textures\\test.png", TEX_TEST);
         InitTextUVs();
 
         SetCharSize(15, 20);
@@ -222,7 +229,7 @@ namespace OGraphics
         glGenBuffers(1, &indexBuffer_);
 
         glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
+        glDepthFunc(GL_LEQUAL);
         glEnable(GL_CULL_FACE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -271,11 +278,12 @@ namespace OGraphics
         numIndexes_ = 0;
     }
 
-    void Renderer::RenderRect(Rect& pos, Rect& tex)
+    void Renderer::RenderRect(const Rect& pos, const Rect& tex)
     {
         if (numIndexes_ >= POINTS_NUM - 6) {
             FLush();
         }
+        
         AddVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
         AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
         AddVertex({ pos.left + pos.width, pos.top, 0 }, { tex.left + tex.width, tex.top });
@@ -283,6 +291,28 @@ namespace OGraphics
         AddVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
         AddVertex({ pos.left, pos.top + pos.height, 0 }, { tex.left, tex.top + tex.height });
         AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
+    }
+
+    void Renderer::RenderRect(Rect&& pos, Rect&& tex)
+    {
+        RenderRect(pos, tex);
+    }
+
+    void Renderer::AddVertex(const Vertex& v, const UV& uv)
+    {
+        if (!texture_) {
+            LogError(L"No active texture");
+            assert(0);
+        }
+        for (int i = 0; i < numVertices_; ++i) {
+            if (vertices_[i] == v && uvs_[i] == uv) {
+                indexes_[numIndexes_++] = i;
+                return;
+            }
+        }
+        vertices_[numVertices_] = v;
+        uvs_[numVertices_++] = uv;
+        indexes_[numIndexes_++] = numVertices_ - 1;
     }
 
     void Renderer::RenderText(const wchar_t* text, float x, float y)
@@ -323,6 +353,52 @@ namespace OGraphics
         charHeight_ = height / (float)height_;
     }
 
+    void Renderer::InitWidgetTex(const Rect& pos, const TexturePos& texPos, WidgetRects& uvs, WidgetRects& rects)
+    {
+        SmartPtr<Texture> tex = textures_[TEX_GUI];
+        float fl1 = texPos.l1 / (float)tex->GetWidth();
+        float fl2 = texPos.l2 / (float)tex->GetWidth();
+        float fl3 = texPos.l3 / (float)tex->GetWidth();
+        float fl4 = texPos.l4 / (float)tex->GetWidth();
+
+        float ft1 = texPos.t1 / (float)tex->GetHeight();
+        float ft2 = texPos.t2 / (float)tex->GetHeight();
+        float ft3 = texPos.t3 / (float)tex->GetHeight();
+        float ft4 = texPos.t4 / (float)tex->GetHeight();
+        uvs.topLeft =     { fl1, ft1, fl2 - fl1, ft2 - ft1 };
+        uvs.top =         { fl2, ft1, fl3 - fl2, ft2 - ft1 };
+        uvs.topRight =    { fl3, ft1, fl4 - fl3, ft2 - ft1 };
+
+        uvs.left =        { fl1, ft2, fl2 - fl1, ft3 - ft2 };
+        uvs.center =      { fl2, ft2, fl3 - fl2, ft3 - ft2 };
+        uvs.right =       { fl3, ft2, fl4 - fl3, ft3 - ft2 };
+
+        uvs.bottomLeft =  { fl1, ft3, fl2 - fl1, ft4 - ft3 };
+        uvs.bottom =      { fl2, ft3, fl3 - fl2, ft4 - ft3 };
+        uvs.bottomRight = { fl3, ft3, fl4 - fl3, ft4 - ft3 };
+        int w1 = texPos.l2 - texPos.l1;
+        int w2 = texPos.l3 - texPos.l2;
+        int w3 = texPos.l4 - texPos.l3;
+        int h1 = texPos.t2 - texPos.t1;
+        int h2 = texPos.t3 - texPos.t2;
+        int h3 = texPos.t4 - texPos.t3;
+        float fw1 = w1 / (float)width_;
+        float fw2 = w2 / (float)width_;
+        float fw3 = w3 / (float)width_;
+        float fh1 = h1 / (float)height_;
+        float fh2 = h2 / (float)height_;
+        float fh3 = h3 / (float)height_;
+        rects.topLeft = { pos.left, pos.top, fw1, fh1 };
+        rects.top = { pos.left + fw1, pos.top, fw2, fh1 };
+        rects.topRight = { pos.left + fw1 + fw2, pos.top, fw3, fh1 };
+        rects.left = { pos.left, pos.top + fh1, fw1, fh2 };
+        rects.center = { pos.left + fw1, pos.top + fh1, fw2, fh2 };
+        rects.right = { pos.left + fw1 + fw2, pos.top + fh1, fw3, fh2 };
+        rects.bottomLeft = { pos.left, pos.top + fh1 + fh2, fw1, fh3 };
+        rects.bottom = { pos.left + fw1, pos.top + fh1 + fh2, fw2, fh3 };
+        rects.bottomRight = { pos.left + fw1 + fw2, pos.top + fh1 + fh2, fw3, fh3 };
+    }
+
     void Renderer::Destroy()
     {
         glDeleteBuffers(1, &vertexBuffer_);
@@ -330,23 +406,6 @@ namespace OGraphics
         glDeleteBuffers(1, &indexBuffer_);
         SDL_GL_DeleteContext(mainGLContext_);
         SDL_DestroyWindow(mainWindow_);
-    }
-
-    void Renderer::AddVertex(const Vertex& v, const UV& uv)
-    {
-        if (!texture_) {
-            LogError(L"No active texture");
-            assert(0);
-        }
-        for (int i = 0; i < numVertices_; ++i) {
-            if (vertices_[i] == v && uvs_[i] == uv) {
-                indexes_[numIndexes_++] = i;
-                return;
-            }
-        }
-        vertices_[numVertices_] = v;
-        uvs_[numVertices_++] = uv;
-        indexes_[numIndexes_++] = numVertices_ - 1;
     }
 
     void Renderer::Clear()

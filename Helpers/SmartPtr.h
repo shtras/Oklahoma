@@ -89,7 +89,7 @@ public:
         return inner_->data_;
     }
 
-    bool operator == (SmartPtr<T>& other) const
+    bool operator == (const SmartPtr<T>& other) const
     {
         return inner_ == other.inner_;
     }
