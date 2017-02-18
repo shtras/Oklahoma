@@ -17,12 +17,14 @@ int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance
     std::wcout.clear();
 #endif
 
-    LogInfo(L"Entering the matrix. %d.%d.%d %ls built from %ls", Version::MAJOR, Version::MINOR, Version::REVISION,
+    LogInfo(L"Entering the matrix. %d.%d.%d %ls built on %hs %hs from %ls", Version::MAJOR, Version::MINOR, Version::REVISION,
 #ifdef DEBUG
         L"Debug"
 #else
         L"Release"
 #endif
+        , __DATE__
+        , __TIME__
         , GIT_HASH);
     Oklahoma& oklahoma = Oklahoma::GetInstance();
     oklahoma.Init();
