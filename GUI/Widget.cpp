@@ -198,6 +198,9 @@ namespace OGUI
         }
         children_.remove(sp);
         children_.push_back(sp);
+        if (parent_) {
+            parent_->MoveToTop(this);
+        }
     }
 
     void Widget::Move(float x, float y, float dx, float dy)

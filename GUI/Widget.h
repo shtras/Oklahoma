@@ -27,6 +27,7 @@ namespace OGUI
         void Move(float x, float y, float dx, float dy);
     protected:
         Widget();
+        Widget(const Widget& other);
         void CreateUVs(WidgetRects& uvs, TexturePos& texPos);
         void CreateRects();
         void Resize(Rect containingRect);
