@@ -89,9 +89,7 @@ namespace OGUI
         renderer.RenderRect(rects_.bottomLeft, uvs_.bottomLeft);
         renderer.RenderRect(rects_.bottom, uvs_.bottom);
         renderer.RenderRect(rects_.bottomRight, uvs_.bottomRight);
-        for (auto& itr : children_) {
-            itr->Render();
-        }
+        RenderChildren();
     }
 
     void Widget::Resize(Rect containingRect)
@@ -101,6 +99,13 @@ namespace OGUI
         pos_.width *= containingRect.width;
         pos_.height *= containingRect.height;
         CreateRects();
+    }
+
+    void Widget::RenderChildren()
+    {
+        for (auto& itr : children_) {
+            itr->Render();
+        }
     }
 
     void Widget::AddWidget(SmartPtr<Widget> widget)

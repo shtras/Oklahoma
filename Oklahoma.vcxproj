@@ -157,6 +157,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Graphics\Renderer.cpp" />
+    <ClCompile Include="GUI\MainWindow.cpp" />
     <ClCompile Include="GUI\Widget.cpp" />
     <ClCompile Include="Helpers\helpers.cpp" />
     <ClCompile Include="Helpers\Log.cpp" />
@@ -169,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\Renderer.h" />
+    <ClInclude Include="GUI\MainWindow.h" />
     <ClInclude Include="GUI\GUIInterface.h" />
     <ClInclude Include="GUI\Widget.h" />
     <ClInclude Include="Helpers\helpers.h" />

@@ -12,12 +12,13 @@ namespace OGUI
         virtual ~Widget();
         virtual void Render();
         void AddWidget(SmartPtr<Widget> widget);
-    private:
+    protected:
         Widget();
         void Init();
         void CreateUVs();
         void CreateRects();
         void Resize(Rect containingRect);
+        void RenderChildren();
         Rect pos_;
         TexturePos texPos_;
         WidgetRects uvs_;
