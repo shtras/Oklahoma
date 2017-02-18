@@ -353,50 +353,19 @@ namespace OGraphics
         charHeight_ = height / (float)height_;
     }
 
-    void Renderer::InitWidgetTex(const Rect& pos, const TexturePos& texPos, WidgetRects& uvs, WidgetRects& rects)
+    const Texture* Renderer::GetTexture(TextureType type)
     {
-        SmartPtr<Texture> tex = textures_[TEX_GUI];
-        float fl1 = texPos.l1 / (float)tex->GetWidth();
-        float fl2 = texPos.l2 / (float)tex->GetWidth();
-        float fl3 = texPos.l3 / (float)tex->GetWidth();
-        float fl4 = texPos.l4 / (float)tex->GetWidth();
+        return textures_[type];
+    }
 
-        float ft1 = texPos.t1 / (float)tex->GetHeight();
-        float ft2 = texPos.t2 / (float)tex->GetHeight();
-        float ft3 = texPos.t3 / (float)tex->GetHeight();
-        float ft4 = texPos.t4 / (float)tex->GetHeight();
-        uvs.topLeft =     { fl1, ft1, fl2 - fl1, ft2 - ft1 };
-        uvs.top =         { fl2, ft1, fl3 - fl2, ft2 - ft1 };
-        uvs.topRight =    { fl3, ft1, fl4 - fl3, ft2 - ft1 };
+    int Renderer::GetWidth() const
+    {
+        return width_;
+    }
 
-        uvs.left =        { fl1, ft2, fl2 - fl1, ft3 - ft2 };
-        uvs.center =      { fl2, ft2, fl3 - fl2, ft3 - ft2 };
-        uvs.right =       { fl3, ft2, fl4 - fl3, ft3 - ft2 };
-
-        uvs.bottomLeft =  { fl1, ft3, fl2 - fl1, ft4 - ft3 };
-        uvs.bottom =      { fl2, ft3, fl3 - fl2, ft4 - ft3 };
-        uvs.bottomRight = { fl3, ft3, fl4 - fl3, ft4 - ft3 };
-        int w1 = texPos.l2 - texPos.l1;
-        int w2 = texPos.l3 - texPos.l2;
-        int w3 = texPos.l4 - texPos.l3;
-        int h1 = texPos.t2 - texPos.t1;
-        int h2 = texPos.t3 - texPos.t2;
-        int h3 = texPos.t4 - texPos.t3;
-        float fw1 = w1 / (float)width_;
-        float fw2 = w2 / (float)width_;
-        float fw3 = w3 / (float)width_;
-        float fh1 = h1 / (float)height_;
-        float fh2 = h2 / (float)height_;
-        float fh3 = h3 / (float)height_;
-        rects.topLeft = { pos.left, pos.top, fw1, fh1 };
-        rects.top = { pos.left + fw1, pos.top, fw2, fh1 };
-        rects.topRight = { pos.left + fw1 + fw2, pos.top, fw3, fh1 };
-        rects.left = { pos.left, pos.top + fh1, fw1, fh2 };
-        rects.center = { pos.left + fw1, pos.top + fh1, fw2, fh2 };
-        rects.right = { pos.left + fw1 + fw2, pos.top + fh1, fw3, fh2 };
-        rects.bottomLeft = { pos.left, pos.top + fh1 + fh2, fw1, fh3 };
-        rects.bottom = { pos.left + fw1, pos.top + fh1 + fh2, fw2, fh3 };
-        rects.bottomRight = { pos.left + fw1 + fw2, pos.top + fh1 + fh2, fw3, fh3 };
+    int Renderer::GetHeight() const
+    {
+        return height_;
     }
 
     void Renderer::Destroy()

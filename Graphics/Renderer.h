@@ -47,7 +47,9 @@ namespace OGraphics
         void SetTexture(TextureType tex);
         void SetShader(ShaderType shader);
         void SetCharSize(int width, int height);
-        void InitWidgetTex(const Rect& pos, const TexturePos& texPos, WidgetRects& uvs, WidgetRects& rects);
+        const Texture* GetTexture(TextureType type);
+        int GetWidth() const;
+        int GetHeight() const;
     private:
         Renderer();
         Renderer(const Renderer& other);

@@ -45,7 +45,7 @@ public:
     {
         AddRef();
     }
-    SmartPtr(SmartPtr<T>& other):
+    SmartPtr(const SmartPtr<T>& other):
         inner_(other.inner_)
     {
         AddRef();

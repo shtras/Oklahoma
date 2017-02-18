@@ -11,13 +11,17 @@ namespace OGUI
         Widget(Rect pos, TexturePos tex);
         virtual ~Widget();
         virtual void Render();
+        void AddWidget(SmartPtr<Widget> widget);
     private:
         Widget();
         void Init();
-
-        TexturePos texPos_;
+        void CreateUVs();
+        void CreateRects();
+        void Resize(Rect containingRect);
         Rect pos_;
+        TexturePos texPos_;
         WidgetRects uvs_;
         WidgetRects rects_;
+        list<SmartPtr<Widget>> children_;
     };
 }

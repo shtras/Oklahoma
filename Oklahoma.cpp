@@ -42,7 +42,12 @@ void Oklahoma::Run()
     wchar_t fpsStr[128];
     Renderer& renderer = Renderer::GetInstance();
     SmartPtr<Widget> w = new Widget({ 0.1f, 0.1f, 0.8f, 0.8f }, { 31, 47, 321, 338, 29, 47, 210, 237 });
-    SmartPtr<Widget> w1 = new Widget({ 0.3f, 0.3f, 0.8f, 0.8f }, { 31, 47, 321, 338, 29, 47, 210, 237 });
+    SmartPtr<Widget> w1 = new Widget({ 0.1f, 0.1f, 0.8f, 0.8f }, { 31, 47, 321, 338, 29, 47, 210, 237 });
+    SmartPtr<Widget> w2 = new Widget({ 0.1f, 0.1f, 0.8f, 0.8f }, { 31, 47, 321, 338, 29, 47, 210, 237 });
+    SmartPtr<Widget> w3 = new Widget({ 0.1f, 0.1f, 0.8f, 0.8f }, { 31, 47, 321, 338, 29, 47, 210, 237 });
+    w->AddWidget(w1);
+    w1->AddWidget(w2);
+    w2->AddWidget(w3);
     while (running_) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -68,7 +73,7 @@ void Oklahoma::Run()
         renderer.SetTexture(Renderer::TEX_TEST);
         renderer.RenderRect({ 0.0f, 0.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f });
         w->Render();
-        w1->Render();
+        //w1->Render();
         renderer.RenderText(fpsStr, 0, 0.9f);
 
         renderer.RenderFrame();

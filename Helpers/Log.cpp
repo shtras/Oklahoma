@@ -20,7 +20,7 @@ namespace ODiagnostics
         SYSTEMTIME timeNow;
         GetSystemTime(&timeNow);
         wchar_t logLine[1024];
-        wchar_t timeFormat[] = L"%.2d:%.2d:%.2d.%.3d - %ls: ";
+        wchar_t timeFormat[] = L"%.2d:%.2d:%.2d.%.3d - %ls:  ";
         swprintf_s(logLine, timeFormat, timeNow.wHour, timeNow.wMinute, timeNow.wSecond, timeNow.wMilliseconds, SeverityToString(s));
         if (timeLength_ == 0) {
             timeLength_ = wcslen(logLine);
@@ -89,7 +89,7 @@ namespace ODiagnostics
         case ODiagnostics::LOG_INFO:
             return L"Info";
         case ODiagnostics::LOG_WARNING:
-            return L"Warning";
+            return L"Warn";
         case ODiagnostics::LOG_ERROR:
             return L"Error";
         default:
