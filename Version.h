@@ -1,6 +1,8 @@
 #pragma once
 
 namespace Version {
+#include "hash.txt"
+
     enum Version
     {
         MAJOR = 0,

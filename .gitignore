@@ -5,3 +5,4 @@ x64/
 *.ipch
 *.log
 rev.txt
+hash.txt
