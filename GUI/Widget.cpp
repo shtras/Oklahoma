@@ -8,8 +8,15 @@ namespace OGUI
     Widget::Widget(Rect pos):
         pos_(pos),
         hovered_(false),
+        pressed_(false),
+        dragged_(false),
+        clickable_(false),
+        draggable_(true),
         visible_(true),
-        texState_(NONE)
+        texState_(NONE),
+        dragStartX_(0),
+        dragStartY_(0),
+        parent_(nullptr)
     {
     }
 
@@ -80,15 +87,15 @@ namespace OGUI
         float fh1 = h1 / (float)height;
         float fh3 = h3 / (float)height;
         float fh2 = pos_.height - fh1 - fh3;
-        rects_.topLeft = { pos_.left, pos_.top, fw1, fh1 };
-        rects_.top = { pos_.left + fw1, pos_.top, fw2, fh1 };
-        rects_.topRight = { pos_.left + fw1 + fw2, pos_.top, fw3, fh1 };
-        rects_.left = { pos_.left, pos_.top + fh1, fw1, fh2 };
-        rects_.center = { pos_.left + fw1, pos_.top + fh1, fw2, fh2 };
-        rects_.right = { pos_.left + fw1 + fw2, pos_.top + fh1, fw3, fh2 };
-        rects_.bottomLeft = { pos_.left, pos_.top + fh1 + fh2, fw1, fh3 };
-        rects_.bottom = { pos_.left + fw1, pos_.top + fh1 + fh2, fw2, fh3 };
-        rects_.bottomRight = { pos_.left + fw1 + fw2, pos_.top + fh1 + fh2, fw3, fh3 };
+        rects_[0] = { pos_.left, pos_.top, fw1, fh1 };
+        rects_[1] = { pos_.left + fw1, pos_.top, fw2, fh1 };
+        rects_[2] = { pos_.left + fw1 + fw2, pos_.top, fw3, fh1 };
+        rects_[3] = { pos_.left, pos_.top + fh1, fw1, fh2 };
+        rects_[4] = { pos_.left + fw1, pos_.top + fh1, fw2, fh2 };
+        rects_[5] = { pos_.left + fw1 + fw2, pos_.top + fh1, fw3, fh2 };
+        rects_[6] = { pos_.left, pos_.top + fh1 + fh2, fw1, fh3 };
+        rects_[7] = { pos_.left + fw1, pos_.top + fh1 + fh2, fw2, fh3 };
+        rects_[8] = { pos_.left + fw1 + fw2, pos_.top + fh1 + fh2, fw3, fh3 };
     }
 
     void Widget::Render()
@@ -96,22 +103,22 @@ namespace OGUI
         if (!visible_) {
             return;
         }
+        Renderer& renderer = Renderer::GetInstance();
         if (texState_ != NONE) {
             WidgetRects* uvs = &uvs_;
             if (hovered_ && (texState_ & HOVERED)) {
                 uvs = &hoveredUVs_;
             }
-            Renderer& renderer = Renderer::GetInstance();
             renderer.SetTexture(Renderer::TEX_GUI);
-            renderer.RenderRect(rects_.topLeft, uvs->topLeft);
-            renderer.RenderRect(rects_.top, uvs->top);
-            renderer.RenderRect(rects_.topRight, uvs->topRight);
-            renderer.RenderRect(rects_.left, uvs->left);
-            renderer.RenderRect(rects_.center, uvs->center);
-            renderer.RenderRect(rects_.right, uvs->right);
-            renderer.RenderRect(rects_.bottomLeft, uvs->bottomLeft);
-            renderer.RenderRect(rects_.bottom, uvs->bottom);
-            renderer.RenderRect(rects_.bottomRight, uvs->bottomRight);
+            renderer.RenderRect(rects_[0], uvs->topLeft);
+            renderer.RenderRect(rects_[1], uvs->top);
+            renderer.RenderRect(rects_[2], uvs->topRight);
+            renderer.RenderRect(rects_[3], uvs->left);
+            renderer.RenderRect(rects_[4], uvs->center);
+            renderer.RenderRect(rects_[5], uvs->right);
+            renderer.RenderRect(rects_[6], uvs->bottomLeft);
+            renderer.RenderRect(rects_[7], uvs->bottom);
+            renderer.RenderRect(rects_[8], uvs->bottomRight);
         }
         RenderChildren();
     }
@@ -145,18 +152,98 @@ namespace OGUI
 
     void Widget::HandleMouseEventSelf(SDL_Event& event, float x, float y)
     {
-
+        switch (event.type)
+        {
+        case SDL_MOUSEBUTTONDOWN:
+            HandleMouseDown(x, y);
+            break;
+        case SDL_MOUSEBUTTONUP:
+            HandleMouseUp(x, y);
+            break;
+        default:
+            break;
+        }
     }
 
-    void Widget::SetHovered(bool val)
+    void Widget::HandleMouseDown(float x, float y)
+    {
+        if (draggable_ && parent_) {
+            parent_->MoveToTop(this);
+        }
+        if (draggable_) {
+            MainWindow::GetInstance().RegisterDragged(this);
+        } else if (clickable_) {
+            MainWindow::GetInstance().RegisterPressed(this);
+        }
+    }
+
+    void Widget::HandleMouseUp(float x, float y)
+    {
+        MainWindow::GetInstance().RegisterDragged(nullptr);
+        MainWindow::GetInstance().RegisterPressed(nullptr);
+    }
+
+    void Widget::SetParent(Widget* w)
+    {
+        parent_ = w;
+    }
+
+    void Widget::MoveToTop(Widget* w)
+    {
+        SmartPtr<Widget> sp;
+        for (auto& itr : children_) {
+            if (itr == w) {
+                sp = itr;
+            }
+        }
+        children_.remove(sp);
+        children_.push_back(sp);
+    }
+
+    void Widget::Move(float x, float y, float dx, float dy)
+    {
+        if (!parent_->IsWithin(pos_.left + dx, pos_.top + dy)) {
+            return;
+        }
+        if (!parent_->IsWithin(pos_.left + pos_.width + dx, pos_.top + pos_.height + dy)) {
+            return;
+        }
+        Move(dx, dy);
+    }
+
+    void Widget::Move(float dx, float dy)
+    {
+        for (int i = 0; i < 9; ++i) {
+            rects_[i].left += dx;
+            rects_[i].top += dy;
+        }
+        pos_.left += dx;
+        pos_.top += dy;
+        for (auto& itr : children_) {
+            itr->Move(dx, dy);
+        }
+    }
+
+    void Widget::ToggleHovered(bool val)
     {
         hovered_ = val;
+    }
+
+    void Widget::TogglePressed(bool val)
+    {
+        pressed_ = val;
+    }
+
+    void Widget::ToggleDragged(bool val)
+    {
+        dragged_ = val;
     }
 
     void Widget::AddWidget(SmartPtr<Widget> widget)
     {
         children_.push_back(widget);
         widget->Resize(pos_);
+        widget->SetParent(this);
     }
 
     bool Widget::HandleMouseEvent(SDL_Event& event, float x, float y)
@@ -164,8 +251,8 @@ namespace OGUI
         if (!IsWithin(x, y)) {
             return false;
         }
-        for (auto& itr : children_) {
-            if (itr->HandleMouseEvent(event, x, y)) {
+        for (auto& itr = children_.rbegin(); itr != children_.rend(); ++itr) {
+            if ((*itr)->HandleMouseEvent(event, x, y)) {
                 return true;
             }
         }

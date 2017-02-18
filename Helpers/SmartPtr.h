@@ -93,6 +93,11 @@ public:
     {
         return inner_ == other.inner_;
     }
+
+    bool operator == (T* data) const
+    {
+        return inner_->data_ == data;
+    }
 private:
     InnerPtr<T>* inner_;
 };

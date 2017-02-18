@@ -54,19 +54,19 @@ void Oklahoma::Run()
     TexturePos tex = { 31, 47, 321, 338, 29, 54, 210, 237 };
     SmartPtr<Widget> w = new Widget({ 0.1f, 0.1f, 0.8f, 0.8f });
     w->Init(tex);
-    //w->SetHoveredTexture(355, 29);
-    SmartPtr<Widget> w1 = new Widget({ 0.1f, 0.1f, 0.3f, 0.3f });
+    SmartPtr<Widget> w1 = new Widget({ 0.1f, 0.1f, 0.6f, 0.6f });
     w1->Init(tex);
     w1->SetHoveredTexture(355, 29);
-    SmartPtr<Widget> w2 = new Widget({ 0.1f, 0.6f, 0.3f, 0.3f });
+    SmartPtr<Widget> w2 = new Widget({ 0.2f, 0.2f, 0.5f, 0.5f });
     w2->Init(tex);
     w2->SetHoveredTexture(355, 29);
-    SmartPtr<Widget> w3 = new Widget({ 0.1f, 0.1f, 0.8f, 0.8f });
+    SmartPtr<Widget> w3 = new Widget({ 0.3f, 0.3f, 0.5f, 0.5f });
     w3->Init(tex);
+    w3->SetHoveredTexture(355, 29);
     mainWindow.AddWidget(w);
     w->AddWidget(w1);
-    w->AddWidget(w2);
-    w2->AddWidget(w3);
+    w1->AddWidget(w2);
+    w->AddWidget(w3);
     while (running_) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -79,6 +79,9 @@ void Oklahoma::Run()
             case SDL_MOUSEBUTTONUP:
             case SDL_MOUSEMOTION:
             {
+                if (event.type == SDL_MOUSEBUTTONUP) {
+                    int a = 0;
+                }
                 float x = event.motion.x / (float)renderer.GetWidth();
                 float y = event.motion.y / (float)renderer.GetHeight();
                 mainWindow.HandleMouseEvent(event, x, y);
