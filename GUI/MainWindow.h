@@ -7,10 +7,11 @@ namespace OGUI
     {
     public:
         static MainWindow& GetInstance();
-        void Render();
+        void RegisterHovered(Widget* w);
     private:
         MainWindow();
         ~MainWindow();
+        Widget* hoveredWidget_;
     };
 
 }

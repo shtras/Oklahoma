@@ -4,7 +4,8 @@
 namespace OGUI
 {
     MainWindow::MainWindow():
-        Widget({ 0.0f, 0.0f, 1.0f, 1.0f }, {})
+        Widget({ 0.0f, 0.0f, 1.0f, 1.0f }),
+        hoveredWidget_(nullptr)
     {
 
     }
@@ -14,15 +15,23 @@ namespace OGUI
 
     }
 
+    void MainWindow::RegisterHovered(Widget* w)
+    {
+        if (w == hoveredWidget_) {
+            return;
+        }
+        if (w) {
+            w->SetHovered(true);
+        }
+        if (hoveredWidget_) {
+            hoveredWidget_->SetHovered(false);
+        }
+        hoveredWidget_ = w;
+    }
+
     MainWindow& MainWindow::GetInstance()
     {
         static MainWindow instance;
         return instance;
     }
-
-    void MainWindow::Render()
-    {
-        RenderChildren();
-    }
-
 }

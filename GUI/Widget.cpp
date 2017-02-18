@@ -1,51 +1,66 @@
 #include "StdAfx.h"
 #include "Widget.h"
+#include "MainWindow.h"
 
 namespace OGUI
 {
 
-    Widget::Widget(Rect pos, TexturePos tex):
-        pos_(pos), texPos_(tex)
+    Widget::Widget(Rect pos):
+        pos_(pos),
+        hovered_(false),
+        visible_(true),
+        texState_(NONE)
     {
-        Init();
     }
 
     Widget::~Widget()
     {
     }
 
-    void Widget::Init()
+    void Widget::Init(TexturePos texPos)
     {
-        CreateUVs();
+        texPos_ = texPos;
+        CreateUVs(uvs_, texPos);
         CreateRects();
+        texState_ |= REGULAR;
     }
 
-    void Widget::CreateUVs()
+    void Widget::SetHoveredTexture(int hoveredX, int hoveredY)
+    {
+        int dx = hoveredX - texPos_.l1;
+        int dy = hoveredY - texPos_.t1;
+        TexturePos texPosHovered = { texPos_.l1 + dx, texPos_.l2 + dx, texPos_.l3 + dx, texPos_.l4 + dx,
+                                     texPos_.t1 + dy, texPos_.t2 + dy, texPos_.t3 + dy, texPos_.t4 + dy };
+        CreateUVs(hoveredUVs_, texPosHovered);
+        texState_ |= HOVERED;
+    }
+
+    void Widget::CreateUVs(WidgetRects& uvs, TexturePos& texPos)
     {
         Renderer& renderer = Renderer::GetInstance();
         int width = renderer.GetWidth();
         int height = renderer.GetHeight();
         const Texture* tex = renderer.GetTexture(Renderer::TEX_GUI);
-        float fl1 = texPos_.l1 / (float)tex->GetWidth();
-        float fl2 = texPos_.l2 / (float)tex->GetWidth();
-        float fl3 = texPos_.l3 / (float)tex->GetWidth();
-        float fl4 = texPos_.l4 / (float)tex->GetWidth();
+        float fl1 = texPos.l1 / (float)tex->GetWidth();
+        float fl2 = texPos.l2 / (float)tex->GetWidth();
+        float fl3 = texPos.l3 / (float)tex->GetWidth();
+        float fl4 = texPos.l4 / (float)tex->GetWidth();
 
-        float ft1 = texPos_.t1 / (float)tex->GetHeight();
-        float ft2 = texPos_.t2 / (float)tex->GetHeight();
-        float ft3 = texPos_.t3 / (float)tex->GetHeight();
-        float ft4 = texPos_.t4 / (float)tex->GetHeight();
-        uvs_.topLeft = { fl1, ft1, fl2 - fl1, ft2 - ft1 };
-        uvs_.top = { fl2, ft1, fl3 - fl2, ft2 - ft1 };
-        uvs_.topRight = { fl3, ft1, fl4 - fl3, ft2 - ft1 };
+        float ft1 = texPos.t1 / (float)tex->GetHeight();
+        float ft2 = texPos.t2 / (float)tex->GetHeight();
+        float ft3 = texPos.t3 / (float)tex->GetHeight();
+        float ft4 = texPos.t4 / (float)tex->GetHeight();
+        uvs.topLeft = { fl1, ft1, fl2 - fl1, ft2 - ft1 };
+        uvs.top = { fl2, ft1, fl3 - fl2, ft2 - ft1 };
+        uvs.topRight = { fl3, ft1, fl4 - fl3, ft2 - ft1 };
 
-        uvs_.left = { fl1, ft2, fl2 - fl1, ft3 - ft2 };
-        uvs_.center = { fl2, ft2, fl3 - fl2, ft3 - ft2 };
-        uvs_.right = { fl3, ft2, fl4 - fl3, ft3 - ft2 };
+        uvs.left = { fl1, ft2, fl2 - fl1, ft3 - ft2 };
+        uvs.center = { fl2, ft2, fl3 - fl2, ft3 - ft2 };
+        uvs.right = { fl3, ft2, fl4 - fl3, ft3 - ft2 };
 
-        uvs_.bottomLeft = { fl1, ft3, fl2 - fl1, ft4 - ft3 };
-        uvs_.bottom = { fl2, ft3, fl3 - fl2, ft4 - ft3 };
-        uvs_.bottomRight = { fl3, ft3, fl4 - fl3, ft4 - ft3 };
+        uvs.bottomLeft = { fl1, ft3, fl2 - fl1, ft4 - ft3 };
+        uvs.bottom = { fl2, ft3, fl3 - fl2, ft4 - ft3 };
+        uvs.bottomRight = { fl3, ft3, fl4 - fl3, ft4 - ft3 };
     }
 
     void Widget::CreateRects()
@@ -78,17 +93,26 @@ namespace OGUI
 
     void Widget::Render()
     {
-        Renderer& renderer = Renderer::GetInstance();
-        renderer.SetTexture(Renderer::TEX_GUI);
-        renderer.RenderRect(rects_.topLeft, uvs_.topLeft);
-        renderer.RenderRect(rects_.top, uvs_.top);
-        renderer.RenderRect(rects_.topRight, uvs_.topRight);
-        renderer.RenderRect(rects_.left, uvs_.left);
-        renderer.RenderRect(rects_.center, uvs_.center);
-        renderer.RenderRect(rects_.right, uvs_.right);
-        renderer.RenderRect(rects_.bottomLeft, uvs_.bottomLeft);
-        renderer.RenderRect(rects_.bottom, uvs_.bottom);
-        renderer.RenderRect(rects_.bottomRight, uvs_.bottomRight);
+        if (!visible_) {
+            return;
+        }
+        if (texState_ != NONE) {
+            WidgetRects* uvs = &uvs_;
+            if (hovered_ && (texState_ & HOVERED)) {
+                uvs = &hoveredUVs_;
+            }
+            Renderer& renderer = Renderer::GetInstance();
+            renderer.SetTexture(Renderer::TEX_GUI);
+            renderer.RenderRect(rects_.topLeft, uvs->topLeft);
+            renderer.RenderRect(rects_.top, uvs->top);
+            renderer.RenderRect(rects_.topRight, uvs->topRight);
+            renderer.RenderRect(rects_.left, uvs->left);
+            renderer.RenderRect(rects_.center, uvs->center);
+            renderer.RenderRect(rects_.right, uvs->right);
+            renderer.RenderRect(rects_.bottomLeft, uvs->bottomLeft);
+            renderer.RenderRect(rects_.bottom, uvs->bottom);
+            renderer.RenderRect(rects_.bottomRight, uvs->bottomRight);
+        }
         RenderChildren();
     }
 
@@ -108,10 +132,46 @@ namespace OGUI
         }
     }
 
+    bool Widget::IsWithin(float x, float y)
+    {
+        if (x < pos_.left || x > pos_.left + pos_.width) {
+            return false;
+        }
+        if (y < pos_.top || y > pos_.top + pos_.height) {
+            return false;
+        }
+        return true;
+    }
+
+    void Widget::HandleMouseEventSelf(SDL_Event& event, float x, float y)
+    {
+
+    }
+
+    void Widget::SetHovered(bool val)
+    {
+        hovered_ = val;
+    }
+
     void Widget::AddWidget(SmartPtr<Widget> widget)
     {
         children_.push_back(widget);
         widget->Resize(pos_);
+    }
+
+    bool Widget::HandleMouseEvent(SDL_Event& event, float x, float y)
+    {
+        if (!IsWithin(x, y)) {
+            return false;
+        }
+        for (auto& itr : children_) {
+            if (itr->HandleMouseEvent(event, x, y)) {
+                return true;
+            }
+        }
+        MainWindow::GetInstance().RegisterHovered(this);
+        HandleMouseEventSelf(event, x, y);
+        return true;
     }
 
 }
