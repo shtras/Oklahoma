@@ -3,6 +3,9 @@
 #include "Version.h"
 #include "Widget.h"
 #include "MainWindow.h"
+#include "Window.h"
+#include "Label.h"
+#include "Button.h"
 
 using namespace OGraphics;
 using namespace OGUI;
@@ -51,22 +54,17 @@ void Oklahoma::Run()
     wchar_t fpsStr[128];
     Renderer& renderer = Renderer::GetInstance();
     MainWindow& mainWindow = MainWindow::GetInstance();
-    TexturePos tex = { 31, 47, 321, 338, 29, 54, 210, 237 };
-    SmartPtr<Widget> w = new Widget({ 0.1f, 0.1f, 0.8f, 0.8f });
-    w->Init(tex);
-    SmartPtr<Widget> w1 = new Widget({ 0.1f, 0.1f, 0.6f, 0.6f });
-    w1->Init(tex);
-    w1->SetHoveredTexture(355, 29);
-    SmartPtr<Widget> w2 = new Widget({ 0.2f, 0.2f, 0.5f, 0.5f });
-    w2->Init(tex);
-    w2->SetHoveredTexture(355, 29);
-    SmartPtr<Widget> w3 = new Widget({ 0.3f, 0.3f, 0.5f, 0.5f });
-    w3->Init(tex);
-    w3->SetHoveredTexture(355, 29);
+    
+    SmartPtr<Widget> w = new Window({ 0.1f, 0.1f, 0.5f, 0.5f });
+    
+    SmartPtr<Widget> b = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
+    b->SetText(L"OK!");
+    w->AddWidget(b);
+
     mainWindow.AddWidget(w);
-    w->AddWidget(w1);
-    w1->AddWidget(w2);
-    w->AddWidget(w3);
+
+    SmartPtr<Widget> fpsText = new Label({ 0.0f, 0.9f, 0.1f, 0.1f });
+    mainWindow.AddWidget(fpsText);
     while (running_) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -98,11 +96,11 @@ void Oklahoma::Run()
             float fps = frames / (float)deltaTicks * 1000.0f;
             frames = 0;
             swprintf_s(fpsStr, L"FPS: %.2f", fps);
+            (fpsText)->SetText(fpsStr);
         }
 
         renderer.StartFrame();
         
-        renderer.RenderText(fpsStr, 0, 0.9f);
         mainWindow.Render();
         renderer.RenderFrame();
     }

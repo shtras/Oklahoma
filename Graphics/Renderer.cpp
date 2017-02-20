@@ -162,7 +162,10 @@ namespace OGraphics
         numVertices_(0),
         numIndexes_(0),
         width_(1280),
-        height_(720)
+        height_(720),
+        dbgFlushes_(0),
+        dbgVertices_(0),
+        dbgRects_(0)
     {
 
     }
@@ -188,7 +191,12 @@ namespace OGraphics
         if (numVertices_ > 0) {
             FLush();
         }
-       
+
+        wcout << L"F: " << dbgFlushes_ << L" V: " << dbgVertices_ << L" R: " << dbgRects_ << endl;
+        dbgFlushes_ = 0;
+        dbgVertices_ = 0;
+        dbgRects_ = 0;
+
         SDL_GL_SwapWindow(mainWindow_);
         GLERR;
         Clear();
@@ -276,6 +284,7 @@ namespace OGraphics
 
         numVertices_ = 0;
         numIndexes_ = 0;
+        ++dbgFlushes_;
     }
 
     void Renderer::RenderRect(const Rect& pos, const Rect& tex)
@@ -291,6 +300,7 @@ namespace OGraphics
         AddVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
         AddVertex({ pos.left, pos.top + pos.height, 0 }, { tex.left, tex.top + tex.height });
         AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
+        ++dbgRects_;
     }
 
     void Renderer::RenderRect(Rect&& pos, Rect&& tex)
@@ -304,15 +314,16 @@ namespace OGraphics
             LogError(L"No active texture");
             assert(0);
         }
-        for (int i = 0; i < numVertices_; ++i) {
-            if (vertices_[i] == v && uvs_[i] == uv) {
-                indexes_[numIndexes_++] = i;
-                return;
-            }
-        }
+//         for (int i = 0; i < numVertices_; ++i) {
+//             if (vertices_[i] == v && uvs_[i] == uv) {
+//                 indexes_[numIndexes_++] = i;
+//                 return;
+//             }
+//         }
         vertices_[numVertices_] = v;
         uvs_[numVertices_++] = uv;
         indexes_[numIndexes_++] = numVertices_ - 1;
+        ++dbgVertices_;
     }
 
     void Renderer::RenderText(const wchar_t* text, float x, float y)
@@ -325,7 +336,7 @@ namespace OGraphics
                 c = ' ';
             }
             Rect& uv = textUVs_[c];
-            RenderRect(Rect({ x + i*charWidth_, y, charWidth_, charHeight_ }), uv);
+            RenderRect({ x + i*charWidth_, y, charWidth_, charHeight_ }, uv);
         }
     }
 

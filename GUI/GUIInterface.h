@@ -6,11 +6,13 @@ namespace OGraphics
     {
         GLfloat x, y, z;
         bool operator== (const Vertex& other) const { return x == other.x && y == other.y && z == other.z; }
+        bool operator<(const Vertex& other) const { return x*y < other.x * other.y; }
     };
     struct UV
     {
         GLfloat u, v;
         bool operator== (const UV& other) const { return u == other.u && v == other.v; }
+        bool operator<(const UV& other) const { return u*v < other.u * other.v; }
     };
     struct Rect
     {

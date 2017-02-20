@@ -33,7 +33,7 @@ namespace OGraphics
 
     class Renderer
     {
-        enum { POINTS_NUM = 2048 };
+        enum { POINTS_NUM = 4096 };
     public:
         enum TextureType { TEX_NONE, TEX_GUI, TEX_FONT, TEX_TEST };
         enum ShaderType { SHADER_DEFAULT };
@@ -82,5 +82,9 @@ namespace OGraphics
         map<TextureType, SmartPtr<Texture>> textures_;
         map<ShaderType, SmartPtr<Shader>> shaders_;
         map<wchar_t, Rect> textUVs_;
+        
+        int dbgFlushes_;
+        int dbgVertices_;
+        int dbgRects_;
     };
 }

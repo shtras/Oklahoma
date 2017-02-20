@@ -5,13 +5,14 @@
 namespace OGUI
 {
 
-    Widget::Widget(Rect pos):
+    Widget::Widget(Rect pos) :
         pos_(pos),
         hovered_(false),
         pressed_(false),
         dragged_(false),
         clickable_(false),
-        draggable_(true),
+        draggable_(false),
+        interactive_(true),
         visible_(true),
         texState_(NONE),
         dragStartX_(0),
@@ -40,6 +41,16 @@ namespace OGUI
                                      texPos_.t1 + dy, texPos_.t2 + dy, texPos_.t3 + dy, texPos_.t4 + dy };
         CreateUVs(hoveredUVs_, texPosHovered);
         texState_ |= HOVERED;
+    }
+
+    void Widget::SetPressedTexture(int pressedX, int pressedY)
+    {
+        int dx = pressedX - texPos_.l1;
+        int dy = pressedY - texPos_.t1;
+        TexturePos texPosPressed = { texPos_.l1 + dx, texPos_.l2 + dx, texPos_.l3 + dx, texPos_.l4 + dx,
+            texPos_.t1 + dy, texPos_.t2 + dy, texPos_.t3 + dy, texPos_.t4 + dy };
+        CreateUVs(pressedUVs_, texPosPressed);
+        texState_ |= PRESSED;
     }
 
     void Widget::CreateUVs(WidgetRects& uvs, TexturePos& texPos)
@@ -109,6 +120,9 @@ namespace OGUI
             if (hovered_ && (texState_ & HOVERED)) {
                 uvs = &hoveredUVs_;
             }
+            if (pressed_ && (texState_ & PRESSED)) {
+                uvs = &pressedUVs_;
+            }
             renderer.SetTexture(Renderer::TEX_GUI);
             renderer.RenderRect(rects_[0], uvs->topLeft);
             renderer.RenderRect(rects_[1], uvs->top);
@@ -130,6 +144,9 @@ namespace OGUI
         pos_.width *= containingRect.width;
         pos_.height *= containingRect.height;
         CreateRects();
+        for (auto& itr : children_) {
+            itr->Resize(containingRect);
+        }
     }
 
     void Widget::RenderChildren()
@@ -194,6 +211,7 @@ namespace OGUI
         for (auto& itr : children_) {
             if (itr == w) {
                 sp = itr;
+                break;
             }
         }
         children_.remove(sp);
@@ -251,6 +269,9 @@ namespace OGUI
 
     bool Widget::HandleMouseEvent(SDL_Event& event, float x, float y)
     {
+        if (!interactive_) {
+            return false;
+        }
         if (!IsWithin(x, y)) {
             return false;
         }

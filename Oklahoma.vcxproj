@@ -157,8 +157,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Graphics\Renderer.cpp" />
+    <ClCompile Include="GUI\Button.cpp" />
+    <ClCompile Include="GUI\Label.cpp" />
     <ClCompile Include="GUI\MainWindow.cpp" />
     <ClCompile Include="GUI\Widget.cpp" />
+    <ClCompile Include="GUI\Window.cpp" />
     <ClCompile Include="Helpers\helpers.cpp" />
     <ClCompile Include="Helpers\Log.cpp" />
     <ClCompile Include="Helpers\SmartPtr.cpp" />
@@ -170,9 +173,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\Renderer.h" />
+    <ClInclude Include="GUI\Button.h" />
+    <ClInclude Include="GUI\Label.h" />
     <ClInclude Include="GUI\MainWindow.h" />
     <ClInclude Include="GUI\GUIInterface.h" />
     <ClInclude Include="GUI\Widget.h" />
+    <ClInclude Include="GUI\Window.h" />
     <ClInclude Include="Helpers\helpers.h" />
     <ClInclude Include="Helpers\Log.h" />
     <ClInclude Include="Helpers\SmartPtr.h" />
