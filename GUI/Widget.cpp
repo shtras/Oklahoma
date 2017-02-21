@@ -14,9 +14,11 @@ namespace OGUI
         draggable_(false),
         interactive_(true),
         visible_(true),
+        keyFocus_(false),
         texState_(NONE),
         dragStartX_(0),
         dragStartY_(0),
+        keyboardListener_(false),
         parent_(nullptr)
     {
     }
@@ -198,6 +200,14 @@ namespace OGUI
     {
         MainWindow::GetInstance().RegisterDragged(nullptr);
         MainWindow::GetInstance().RegisterPressed(nullptr);
+        if (clickable_) {
+            OnClick();
+        }
+        if (keyboardListener_) {
+            MainWindow::GetInstance().RegisterKeyboardListener(this);
+        } else {
+            MainWindow::GetInstance().RegisterKeyboardListener(nullptr);
+        }
     }
 
     void Widget::SetParent(Widget* w)
@@ -260,6 +270,11 @@ namespace OGUI
         dragged_ = val;
     }
 
+    void Widget::ToggleKeyFocus(bool val)
+    {
+        keyFocus_ = val;
+    }
+
     void Widget::AddWidget(SmartPtr<Widget> widget)
     {
         children_.push_back(widget);
@@ -273,6 +288,12 @@ namespace OGUI
             return false;
         }
         if (!IsWithin(x, y)) {
+            if (hovered_) {
+                MainWindow::GetInstance().RegisterHovered(nullptr);
+            }
+            if (pressed_) {
+                MainWindow::GetInstance().RegisterPressed(nullptr);
+            }
             return false;
         }
         for (auto& itr = children_.rbegin(); itr != children_.rend(); ++itr) {
@@ -280,9 +301,9 @@ namespace OGUI
                 return true;
             }
         }
+
         MainWindow::GetInstance().RegisterHovered(this);
         HandleMouseEventSelf(event, x, y);
         return true;
     }
-
 }

@@ -9,7 +9,7 @@ namespace OGUI
         label_(new Label({ 0.0f, 0.0f, 1.0f, 1.0f }))
     {
         AddWidget(label_);
-        Init({ 336, 338, 352, 354, 2, 4, 16, 18 });
+        Init({ 336, 339, 352, 354, 2, 4, 16, 18 });
         SetHoveredTexture(357, 2);
         SetPressedTexture(378, 2);
         clickable_ = true;
@@ -28,6 +28,11 @@ namespace OGUI
     void Button::SetText(const wchar_t* str)
     {
         label_->SetText(str);
+    }
+
+    void Button::OnClick()
+    {
+
     }
 
 }

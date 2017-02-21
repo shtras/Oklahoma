@@ -11,6 +11,7 @@ namespace OGUI
         ~Button();
         void SetText(wstring& str) override;
         void SetText(const wchar_t* str) override;
+        void OnClick() override;
     protected:
         SmartPtr<Widget> label_;
     };

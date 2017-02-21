@@ -8,7 +8,8 @@ namespace OGUI
         Widget({ 0.0f, 0.0f, 1.0f, 1.0f }),
         hoveredWidget_(nullptr),
         pressedWidget_(nullptr),
-        draggedWidget_(nullptr)
+        draggedWidget_(nullptr),
+        keyboardListenerWidget_(nullptr)
     {
         clickable_ = false;
         draggable_ = false;
@@ -61,6 +62,20 @@ namespace OGUI
         draggedWidget_ = w;
     }
 
+    void MainWindow::RegisterKeyboardListener(Widget* w)
+    {
+        if (w == keyboardListenerWidget_) {
+            return;
+        }
+        if (w) {
+            w->ToggleKeyFocus(true);
+        }
+        if (keyboardListenerWidget_) {
+            keyboardListenerWidget_->ToggleKeyFocus(false);
+        }
+        keyboardListenerWidget_ = w;
+    }
+
     bool MainWindow::HandleMouseEvent(SDL_Event& event, float x, float y)
     {
         if (draggedWidget_ && event.type == SDL_MOUSEMOTION) {
@@ -69,6 +84,13 @@ namespace OGUI
             return true;
         }
         return Widget::HandleMouseEvent(event, x, y);
+    }
+
+    void MainWindow::HandleKeyboardEvent(SDL_Event& event)
+    {
+        if (keyboardListenerWidget_) {
+            keyboardListenerWidget_->HandleKeyboardEvent(event);
+        }
     }
 
     MainWindow& MainWindow::GetInstance()

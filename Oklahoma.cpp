@@ -6,6 +6,7 @@
 #include "Window.h"
 #include "Label.h"
 #include "Button.h"
+#include "TextInput.h"
 
 using namespace OGraphics;
 using namespace OGUI;
@@ -60,7 +61,8 @@ void Oklahoma::Run()
     SmartPtr<Widget> b = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
     b->SetText(L"OK!");
     w->AddWidget(b);
-
+    SmartPtr<Widget> inp = new TextInput({0.1f, 0.1f, 0.8f, 0.1f});
+    w->AddWidget(inp);
     mainWindow.AddWidget(w);
 
     SmartPtr<Widget> fpsText = new Label({ 0.0f, 0.9f, 0.1f, 0.1f });
@@ -85,6 +87,10 @@ void Oklahoma::Run()
                 mainWindow.HandleMouseEvent(event, x, y);
                 break;
             }
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                mainWindow.HandleKeyboardEvent(event);
+                break;
             }
         }
 

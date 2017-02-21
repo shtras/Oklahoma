@@ -23,13 +23,16 @@ namespace OGUI
         void ToggleHovered(bool val);
         void TogglePressed(bool val);
         void ToggleDragged(bool val);
+        void ToggleKeyFocus(bool val);
         void Init(TexturePos texPos);
         void SetHoveredTexture(int hoveredX, int hoveredY);
         void SetPressedTexture(int pressedX, int pressedY);
         void Move(float x, float y, float dx, float dy);
 
-        virtual void SetText(wstring& str) {};
-        virtual void SetText(const wchar_t* str) {};
+        virtual void SetText(wstring& str) { assert(0); };
+        virtual void SetText(const wchar_t* str) { assert(0); };
+        virtual void HandleKeyboardEvent(SDL_Event& event) { assert(0); };
+
     protected:
         Widget();
         Widget(const Widget& other);
@@ -44,6 +47,7 @@ namespace OGUI
         void SetParent(Widget* w);
         void MoveToTop(Widget* w);
         void Move(float dx, float dy);
+        virtual void OnClick() { };
         Rect pos_;
         TexturePos texPos_;
         WidgetRects uvs_;
@@ -56,10 +60,12 @@ namespace OGUI
         bool pressed_;
         bool dragged_;
         bool visible_;
+        bool keyFocus_;
         bool interactive_;
 
         bool clickable_;
         bool draggable_;
+        bool keyboardListener_;
         float dragStartX_;
         float dragStartY_;
         Widget* parent_;

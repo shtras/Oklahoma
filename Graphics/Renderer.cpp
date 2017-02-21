@@ -192,7 +192,7 @@ namespace OGraphics
             FLush();
         }
 
-        wcout << L"F: " << dbgFlushes_ << L" V: " << dbgVertices_ << L" R: " << dbgRects_ << endl;
+        //wcout << L"F: " << dbgFlushes_ << L" V: " << dbgVertices_ << L" R: " << dbgRects_ << endl;
         dbgFlushes_ = 0;
         dbgVertices_ = 0;
         dbgRects_ = 0;
@@ -377,6 +377,11 @@ namespace OGraphics
     int Renderer::GetHeight() const
     {
         return height_;
+    }
+
+    bool Renderer::IsFontSymbol(wchar_t c) const
+    {
+        return textUVs_.count(c) > 0;
     }
 
     void Renderer::Destroy()

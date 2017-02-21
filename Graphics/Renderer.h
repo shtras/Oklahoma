@@ -50,6 +50,7 @@ namespace OGraphics
         const Texture* GetTexture(TextureType type);
         int GetWidth() const;
         int GetHeight() const;
+        bool IsFontSymbol(wchar_t) const;
     private:
         Renderer();
         Renderer(const Renderer& other);
