@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <functional>
 
 using namespace std;
 

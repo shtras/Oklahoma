@@ -7,6 +7,7 @@ public:
     static Oklahoma& GetInstance();
     void Run();
     void Init();
+    void Quit();
 private:
     Oklahoma();
     ~Oklahoma();

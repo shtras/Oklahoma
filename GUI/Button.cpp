@@ -17,7 +17,6 @@ namespace OGUI
 
     Button::~Button()
     {
-
     }
 
     void Button::SetText(wstring& str)
@@ -31,6 +30,13 @@ namespace OGUI
     }
 
     void Button::OnClick()
+    {
+        if (F) {
+            F();
+        }
+    }
+
+    void Button::Bind()
     {
 
     }

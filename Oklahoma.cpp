@@ -58,7 +58,9 @@ void Oklahoma::Run()
     
     SmartPtr<Widget> w = new Window({ 0.1f, 0.1f, 0.5f, 0.5f });
     
-    SmartPtr<Widget> b = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
+    Button* btn = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
+    btn->F = bind(&Oklahoma::Quit, this);
+    SmartPtr<Widget> b = btn;
     b->SetText(L"OK!");
     w->AddWidget(b);
     SmartPtr<Widget> inp = new TextInput({0.1f, 0.1f, 0.8f, 0.1f});
@@ -117,6 +119,11 @@ void Oklahoma::Init()
     Renderer& renderer = Renderer::GetInstance();
     renderer.Init();
     renderer.SetCharSize(20, 40);
+}
+
+void Oklahoma::Quit()
+{
+    running_ = false;
 }
 
 Oklahoma::Oklahoma() :
