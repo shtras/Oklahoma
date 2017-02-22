@@ -165,7 +165,8 @@ namespace OGraphics
         height_(720),
         dbgFlushes_(0),
         dbgVertices_(0),
-        dbgRects_(0)
+        dbgRects_(0),
+        boundRect_({ -1.0f, -1.0f, 2.0f, 2.0f })
     {
 
     }
@@ -184,6 +185,7 @@ namespace OGraphics
     void Renderer::StartFrame()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ResetBound();
     }
 
     void Renderer::RenderFrame()
@@ -262,8 +264,10 @@ namespace OGraphics
         GLuint textureID = texture_->GetTextureID();
         GLuint matrixLocation = glGetUniformLocation(programID, "MVP");
         GLuint textureLocation = glGetUniformLocation(programID, "sampler");
+        GLuint boundLocation = glGetUniformLocation(programID, "bound");
         glUseProgram(programID);
         glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, &mvp_[0][0]);
+        glUniform4f(boundLocation, boundRect_.left * 2.0f - 1.0f, (boundRect_.top + boundRect_.height) * -2.0f + 1.0f, (boundRect_.left + boundRect_.width) * 2.0f - 1.0f, boundRect_.top * -2.0f + 1.0f);
 
         glBindTexture(GL_TEXTURE_2D, textureID);
         glUniform1i(textureLocation, 0);
@@ -382,6 +386,20 @@ namespace OGraphics
     bool Renderer::IsFontSymbol(wchar_t c) const
     {
         return textUVs_.count(c) > 0;
+    }
+
+    void Renderer::SetBound(const Rect& r)
+    {
+        if (r == boundRect_) {
+            return;
+        }
+        FLush();
+        boundRect_ = r;
+    }
+
+    void Renderer::ResetBound()
+    {
+        SetBound({0.0f, 0.0f, 1.0f, 1.0f});
     }
 
     void Renderer::Destroy()

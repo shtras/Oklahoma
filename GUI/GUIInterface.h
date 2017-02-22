@@ -17,6 +17,7 @@ namespace OGraphics
     struct Rect
     {
         float left, top, width, height;
+        bool operator == (const Rect& other) const { return left == other.left && top == other.top && width == other.width && height == other.height; }
     };
 }
 

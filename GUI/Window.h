@@ -8,6 +8,7 @@ namespace OGUI
     public:
         Window(Rect pos);
         ~Window();
+        void Render() override;
     protected:
     };
 }

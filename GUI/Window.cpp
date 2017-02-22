@@ -16,4 +16,11 @@ namespace OGUI
 
     }
 
+    void Window::Render()
+    {
+        Renderer::GetInstance().SetBound(pos_);
+        Widget::Render();
+        Renderer::GetInstance().ResetBound();
+    }
+
 }

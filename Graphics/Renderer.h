@@ -51,6 +51,8 @@ namespace OGraphics
         int GetWidth() const;
         int GetHeight() const;
         bool IsFontSymbol(wchar_t) const;
+        void SetBound(const Rect& r);
+        void ResetBound();
     private:
         Renderer();
         Renderer(const Renderer& other);
@@ -76,6 +78,7 @@ namespace OGraphics
         int height_;
         float charWidth_;
         float charHeight_;
+        Rect boundRect_;
 
         glm::mat4 mvp_;
         SmartPtr<Shader> shader_;

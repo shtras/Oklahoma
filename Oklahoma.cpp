@@ -57,6 +57,8 @@ void Oklahoma::Run()
     MainWindow& mainWindow = MainWindow::GetInstance();
     
     SmartPtr<Widget> w = new Window({ 0.1f, 0.1f, 0.5f, 0.5f });
+    SmartPtr<Widget> w1 = new Window({ 0.4f, 0.4f, 0.5f, 0.5f });
+    w->AddWidget(w1);
     
     Button* btn = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
     btn->F = bind(&Oklahoma::Quit, this);
