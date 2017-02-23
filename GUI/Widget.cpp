@@ -142,7 +142,7 @@ namespace OGUI
     void Widget::Resize(Rect containingRect)
     {
         pos_.left = containingRect.left + pos_.left * containingRect.width;
-        pos_.top = containingRect.top + pos_.top * containingRect.width;
+        pos_.top = containingRect.top + pos_.top * containingRect.height;
         pos_.width *= containingRect.width;
         pos_.height *= containingRect.height;
         CreateRects();
@@ -255,6 +255,11 @@ namespace OGUI
         }
     }
 
+    void Widget::SetDraggable(bool value)
+    {
+        draggable_ = value;
+    }
+
     void Widget::ToggleHovered(bool val)
     {
         hovered_ = val;
@@ -284,7 +289,7 @@ namespace OGUI
 
     bool Widget::HandleMouseEvent(SDL_Event& event, float x, float y)
     {
-        if (!interactive_) {
+        if (!interactive_ || !visible_) {
             return false;
         }
         if (!IsWithin(x, y)) {
@@ -306,4 +311,10 @@ namespace OGUI
         HandleMouseEventSelf(event, x, y);
         return true;
     }
+
+    void Widget::SetVisible(bool value)
+    {
+        visible_ = value;
+    }
+
 }

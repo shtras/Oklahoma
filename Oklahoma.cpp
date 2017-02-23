@@ -57,16 +57,27 @@ void Oklahoma::Run()
     MainWindow& mainWindow = MainWindow::GetInstance();
     
     SmartPtr<Widget> w = new Window({ 0.1f, 0.1f, 0.5f, 0.5f });
-    SmartPtr<Widget> w1 = new Window({ 0.4f, 0.4f, 0.5f, 0.5f });
-    w->AddWidget(w1);
-    
+
     Button* btn = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
     btn->F = bind(&Oklahoma::Quit, this);
-    SmartPtr<Widget> b = btn;
-    b->SetText(L"OK!");
-    w->AddWidget(b);
-    SmartPtr<Widget> inp = new TextInput({0.1f, 0.1f, 0.8f, 0.1f});
-    w->AddWidget(inp);
+    btn->SetText(L"OK!");
+    w->AddWidget(btn);
+
+     Window* w1 = new Window({ 0.1f, 0.1f, 0.8f, 0.6f });
+     w->AddWidget(w1);
+     w1->SetDraggable(false);
+     w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
+     for (int i = 0; i < 10; ++i) {
+         Label* l = new Label({ 0.1f, i * 0.15f, 0.8f, 0.15f });
+         wchar_t txt[128];
+         swprintf_s(txt, L"Labeliko # %d", i);
+         l->SetText(txt);
+         w1->AddWidget(l);
+     }
+
+    //SmartPtr<Widget> inp = new TextInput({0.1f, 0.1f, 0.8f, 0.1f});
+    //w->AddWidget(inp);
+
     mainWindow.AddWidget(w);
 
     SmartPtr<Widget> fpsText = new Label({ 0.0f, 0.9f, 0.1f, 0.1f });

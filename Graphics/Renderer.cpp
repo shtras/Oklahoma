@@ -402,6 +402,14 @@ namespace OGraphics
         SetBound({0.0f, 0.0f, 1.0f, 1.0f});
     }
 
+    void Renderer::InitUVs(Rect& uvs) const
+    {
+        uvs.left /= (float)width_;
+        uvs.width /= (float)width_;
+        uvs.top /= (float)height_;
+        uvs.height /= (float)height_;
+    }
+
     void Renderer::Destroy()
     {
         glDeleteBuffers(1, &vertexBuffer_);

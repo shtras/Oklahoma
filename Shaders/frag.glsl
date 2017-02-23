@@ -14,6 +14,6 @@ void main() {
        && vPos.y <= bound[3]) {
         color = texture( sampler, UV ).rgba;
     } else {
-        color = vec4(0,0,0,1);
+        color = vec4(0,0,0,0);
     }
 }

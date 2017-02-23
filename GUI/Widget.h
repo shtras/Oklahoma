@@ -32,7 +32,8 @@ namespace OGUI
         virtual void SetText(wstring& str) { assert(0); };
         virtual void SetText(const wchar_t* str) { assert(0); };
         virtual void HandleKeyboardEvent(SDL_Event& event) { assert(0); };
-
+        void SetDraggable(bool value);
+        void SetVisible(bool value);
     protected:
         Widget();
         Widget(const Widget& other);
