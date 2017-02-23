@@ -53,7 +53,7 @@ namespace OGraphics
         bool IsFontSymbol(wchar_t) const;
         void SetBound(const Rect& r);
         void ResetBound();
-        void InitUVs(Rect& uvs) const;
+        void InitUVs(Rect& uvs, TextureType type);
     private:
         Renderer();
         Renderer(const Renderer& other);

@@ -402,12 +402,13 @@ namespace OGraphics
         SetBound({0.0f, 0.0f, 1.0f, 1.0f});
     }
 
-    void Renderer::InitUVs(Rect& uvs) const
+    void Renderer::InitUVs(Rect& uvs, TextureType type)
     {
-        uvs.left /= (float)width_;
-        uvs.width /= (float)width_;
-        uvs.top /= (float)height_;
-        uvs.height /= (float)height_;
+        const Texture* tex = GetTexture(type);
+        uvs.left /= (float)tex->GetWidth();
+        uvs.width /= (float)tex->GetWidth();
+        uvs.top /= (float)tex->GetHeight();
+        uvs.height /= (float)tex->GetHeight();
     }
 
     void Renderer::Destroy()

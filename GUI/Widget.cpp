@@ -233,12 +233,12 @@ namespace OGUI
 
     void Widget::Move(float x, float y, float dx, float dy)
     {
-        if (!parent_->IsWithin(pos_.left + dx, pos_.top + dy)) {
-            return;
-        }
-        if (!parent_->IsWithin(pos_.left + pos_.width + dx, pos_.top + pos_.height + dy)) {
-            return;
-        }
+//         if (!parent_->IsWithin(pos_.left + dx, pos_.top + dy)) {
+//             return;
+//         }
+//         if (!parent_->IsWithin(pos_.left + pos_.width + dx, pos_.top + pos_.height + dy)) {
+//             return;
+//         }
         Move(dx, dy);
     }
 

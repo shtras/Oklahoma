@@ -15,10 +15,11 @@ namespace OGUI
             PRESSED=4
         };
     public:
+        friend class Window;
         Widget(Rect pos);
         virtual ~Widget();
         virtual void Render();
-        void AddWidget(SmartPtr<Widget> widget);
+        virtual void AddWidget(SmartPtr<Widget> widget);
         virtual bool HandleMouseEvent(SDL_Event& event, float x, float y);
         void ToggleHovered(bool val);
         void TogglePressed(bool val);

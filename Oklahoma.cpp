@@ -64,16 +64,16 @@ void Oklahoma::Run()
     w->AddWidget(btn);
 
      Window* w1 = new Window({ 0.1f, 0.1f, 0.8f, 0.6f });
-     w->AddWidget(w1);
      w1->SetDraggable(false);
      w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
-     for (int i = 0; i < 10; ++i) {
+     for (int i = 0; i < 20; ++i) {
          Label* l = new Label({ 0.1f, i * 0.15f, 0.8f, 0.15f });
          wchar_t txt[128];
          swprintf_s(txt, L"Labeliko # %d", i);
          l->SetText(txt);
          w1->AddWidget(l);
      }
+     w->AddWidget(w1);
 
     //SmartPtr<Widget> inp = new TextInput({0.1f, 0.1f, 0.8f, 0.1f});
     //w->AddWidget(inp);

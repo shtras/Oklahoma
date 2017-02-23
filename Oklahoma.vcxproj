@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="GUI\Button.cpp" />
+    <ClCompile Include="GUI\Image.cpp" />
     <ClCompile Include="GUI\Label.cpp" />
     <ClCompile Include="GUI\MainWindow.cpp" />
     <ClCompile Include="GUI\TextInput.cpp" />
@@ -177,6 +178,7 @@
   <ItemGroup>
     <ClInclude Include="Graphics\Renderer.h" />
     <ClInclude Include="GUI\Button.h" />
+    <ClInclude Include="GUI\Image.h" />
     <ClInclude Include="GUI\Label.h" />
     <ClInclude Include="GUI\MainWindow.h" />
     <ClInclude Include="GUI\GUIInterface.h" />
