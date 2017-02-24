@@ -58,9 +58,10 @@ namespace OGUI {
 
     void TextInput::HandleKeyboardEvent(SDL_Event& event)
     {
+        wchar_t c = event.key.keysym.sym;
         if (event.key.type == SDL_KEYDOWN) {
-            bool shift = IsShift(event);
-            bool ctrl = IsCtrl(event);
+            bool shift = IsShift(event.key.keysym);
+            bool ctrl = IsCtrl(event.key.keysym);
             switch (event.key.keysym.sym)
             {
             case SDLK_BACKSPACE:
@@ -98,9 +99,18 @@ namespace OGUI {
                 MoveCursor((int)text_.length(), shift);
                 break;
             default:
-                if (Renderer::GetInstance().IsFontSymbol(event.key.keysym.sym)) {
+                if (event.key.keysym.sym & SDLK_SCANCODE_MASK) {
+                    if (c >= SDL_SCANCODE_KP_1 && c <= SDL_SCANCODE_KP_9) {
+                        c = c - SDL_SCANCODE_KP_1 + L'1';
+                    } else if (c == SDL_SCANCODE_KP_0) {
+                        c = L'0';
+                    } else {
+                        break;
+                    }
+                }
+                if (Renderer::GetInstance().IsFontSymbol(c)) {
                     Erase();
-                    wchar_t c = GetChar(event.key.keysym);
+                    c = GetChar(c, event.key.keysym);
                     text_.insert(cursorX_, 1, c);
                     ++cursorX_;
                 }
@@ -187,14 +197,14 @@ namespace OGUI {
         return res;
     }
 
-    bool TextInput::IsShift(SDL_Event& event)
+    bool TextInput::IsShift(SDL_Keysym& sym)
     {
-        return (event.key.keysym.mod & KMOD_LSHIFT) || (event.key.keysym.mod & KMOD_RSHIFT);
+        return (sym.mod & KMOD_LSHIFT) || (sym.mod & KMOD_RSHIFT);
     }
 
-    bool TextInput::IsCtrl(SDL_Event& event)
+    bool TextInput::IsCtrl(SDL_Keysym& sym)
     {
-        return (event.key.keysym.mod & KMOD_LCTRL) || (event.key.keysym.mod & KMOD_RCTRL);
+        return (sym.mod & KMOD_LCTRL) || (sym.mod & KMOD_RCTRL);
     }
 
     bool TextInput::IsWordChar(wchar_t c)
@@ -202,9 +212,9 @@ namespace OGUI {
         return wordChars_.count(c) > 0;
     }
 
-    wchar_t TextInput::GetChar(SDL_Keysym& sym)
+    wchar_t TextInput::GetChar(wchar_t c, SDL_Keysym& sym)
     {
-        wchar_t res = sym.sym;
+        wchar_t res = c;
         if ((sym.mod & KMOD_LSHIFT) || (sym.mod & KMOD_RSHIFT)) {
             if (shiftChars_.count(res) > 0) {
                 res = shiftChars_[res];

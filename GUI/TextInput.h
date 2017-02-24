@@ -17,11 +17,11 @@ namespace OGUI
         void HandleMouseDown(float x, float y) override;
         int GetCharPos(float x, float y);
         int FindWordBoundary(int dx);
-        bool IsShift(SDL_Event& event);
-        bool IsCtrl(SDL_Event& event);
+        bool IsShift(SDL_Keysym& event);
+        bool IsCtrl(SDL_Keysym& event);
         bool IsWordChar(wchar_t c);
         wstring text_;
-        wchar_t GetChar(SDL_Keysym& sym);
+        wchar_t GetChar(wchar_t c, SDL_Keysym& sym);
         map<wchar_t, wchar_t> shiftChars_;
         int cursorX_;
         int selectStart_;
