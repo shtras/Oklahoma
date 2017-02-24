@@ -58,15 +58,11 @@ void Oklahoma::Run()
     
     Window* w = new Window({ 0.1f, 0.1f, 0.5f, 0.5f });
     w->ToggleScrollBar(ScrollBar::VERTICAL, true);
-//     Button* btn = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
-//     btn->F = bind(&Oklahoma::Quit, this);
-//     btn->SetText(L"OK!");
-//     w->AddWidget(btn);
 
      Window* w1 = new Window({ 0.1f, 0.1f, 0.8f, 0.6f });
      //w1->SetDraggable(false);
      w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
-     for (int i = 0; i < 1; ++i) {
+     for (int i = 0; i < 15; ++i) {
          Label* l = new Label({ 0.1f, i * 0.15f, 0.8f, 0.15f });
          wchar_t txt[128];
          swprintf_s(txt, L"Labeliko # %d", i);
@@ -74,6 +70,14 @@ void Oklahoma::Run()
          w1->AddWidget(l);
      }
      w->AddWidget(w1);
+
+//      Window* w2 = new Window({ 0.1f, 0.1f, 0.8f, 0.6f });
+//      w1->AddWidget(w2);
+
+     Button* btn = new Button({ 0.4f, 0.85f, 0.2f, 0.1f });
+     btn->F = bind(&Oklahoma::Quit, this);
+     btn->SetText(L"OK!");
+     w->AddWidget(btn);
 
     //SmartPtr<Widget> inp = new TextInput({0.1f, 0.1f, 0.8f, 0.1f});
     //w->AddWidget(inp);

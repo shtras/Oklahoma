@@ -400,10 +400,8 @@ namespace OGraphics
     void Renderer::PopBound()
     {
         Rect r = boundRectQueue_.back();
+        FLush();
         boundRectQueue_.pop_back();
-        //if (r != boundRectQueue_.back()) {
-            FLush();
-        //}
     }
 
     void Renderer::InitUVs(Rect& uvs, TextureType type)
