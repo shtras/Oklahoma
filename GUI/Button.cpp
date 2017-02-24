@@ -9,9 +9,9 @@ namespace OGUI
         label_(new Label({ 0.0f, 0.0f, 1.0f, 1.0f }))
     {
         AddWidget(label_);
-        Init({ 336, 339, 352, 354, 2, 4, 16, 18 });
-        SetHoveredTexture(357, 2);
-        SetPressedTexture(378, 2);
+        Init({ 168, 172, 184, 187, 2, 4, 16, 19 });
+        SetHoveredTexture(189, 2);
+        SetPressedTexture(210, 2);
         clickable_ = true;
     }
 

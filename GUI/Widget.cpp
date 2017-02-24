@@ -37,7 +37,7 @@ namespace OGUI
         texPos_ = texPos;
         CreateUVs(uvs_, texPos);
         CreateRects();
-        texState_ |= REGULAR;
+        texState_ = REGULAR;
     }
 
     void Widget::SetHoveredTexture(int hoveredX, int hoveredY)

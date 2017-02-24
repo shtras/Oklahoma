@@ -54,6 +54,8 @@ namespace OGraphics
         void PushBound(const Rect& r);
         void PopBound();
         void InitUVs(Rect& uvs, TextureType type);
+        float GetPixelWidth() const;
+        float GetPixelHeight() const;
     private:
         Renderer();
         Renderer(const Renderer& other);

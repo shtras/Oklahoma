@@ -10,7 +10,7 @@ namespace OGUI
     class ScrollBar : public Widget
     {
     public:
-        enum ScrollBarType { VERTICAL = 0, HORIZONTAL = 1, MAX_TYPE=HORIZONTAL };
+        enum ScrollBarType { VERTICAL = 0, HORIZONTAL = 1, MAX_TYPE };
         ScrollBar(Window* wnd, Rect pos, ScrollBarType type);
         ~ScrollBar();
         void SetPosition(float y, float height);
@@ -40,8 +40,10 @@ namespace OGUI
         void HandleMouseEventSelf(SDL_Event& event, float x, float y) override;
     protected:
         void RecalcContents();
-        ScrollBar* scrollBars_[ScrollBar::MAX_TYPE + 1];
+        ScrollBar* scrollBars_[ScrollBar::MAX_TYPE];
         float totalHeight_;
         float scrollTop_;
+        bool verticalScroll_;
+        bool horizontalScroll_;
     };
 }

@@ -413,6 +413,16 @@ namespace OGraphics
         uvs.height /= (float)tex->GetHeight();
     }
 
+    float Renderer::GetPixelWidth() const
+    {
+        return 1 / (float)width_;
+    }
+
+    float Renderer::GetPixelHeight() const
+    {
+        return 1 / (float)height_;
+    }
+
     void Renderer::Destroy()
     {
         glDeleteBuffers(1, &vertexBuffer_);
@@ -468,5 +478,4 @@ namespace OGraphics
             }
         }
     }
-
 }

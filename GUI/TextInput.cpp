@@ -6,7 +6,7 @@ namespace OGUI {
         Widget(pos),
         cursorX_(0)
     {
-        Init({ 336, 339, 352, 354, 2, 4, 16, 18 });
+        Init({ 168, 172, 184, 187, 2, 4, 16, 19 });
         clickable_ = true;
         keyboardListener_ = true;
         for (wchar_t c = L'a'; c <= L'z'; ++c) {
@@ -18,8 +18,8 @@ namespace OGUI {
         for (int i = 0; i < str1.length(); ++i) {
             shiftChars_[str1[i]] = str2[i];
         }
-        const OGraphics::Texture* tex = Renderer::GetInstance().GetTexture(Renderer::TEX_GUI);
-        cursorUVs_ = {336 / (float)tex->GetWidth(), 20/(float)tex->GetHeight(), 7 / (float)tex->GetWidth(), 12 / (float)tex->GetHeight() };
+        cursorUVs_ = { 168, 20, 7, 12 };
+        Renderer::GetInstance().InitUVs(cursorUVs_, Renderer::TEX_GUI);
     }
 
     TextInput::~TextInput()

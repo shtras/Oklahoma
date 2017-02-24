@@ -7,14 +7,17 @@ namespace OGUI
     Window::Window(Rect pos) :
         Widget(pos),
         totalHeight_(1.0f),
-        scrollTop_(0)
+        scrollTop_(0),
+        verticalScroll_(false),
+        horizontalScroll_(false)
     {
         draggable_ = true;
-        Init({2, 36, 328, 333, 2, 36, 225, 240});
+        Init({2, 36, 76, 82, 2, 36, 225, 240});
+        SetHoveredTexture(85, 2);
         Renderer& renderer = Renderer::GetInstance();
         float scrollWidth = 50 / (float)renderer.GetWidth();
         float scrollHeight = 50 / (float)renderer.GetHeight();
-        scrollBars_[ScrollBar::VERTICAL] = new ScrollBar(this, {1.0f - scrollWidth, 0.0f, scrollWidth, 1.0f - scrollHeight}, ScrollBar::VERTICAL);
+        scrollBars_[ScrollBar::VERTICAL] = new ScrollBar(this, {1.0f - scrollWidth - 2 * renderer.GetPixelWidth(), 2 * renderer.GetPixelHeight(), scrollWidth, 1.0f - scrollHeight}, ScrollBar::VERTICAL);
         scrollBars_[ScrollBar::HORIZONTAL] = new ScrollBar(this, {0.0f, 1.0f - scrollHeight, 1.0f - scrollWidth, scrollHeight}, ScrollBar::HORIZONTAL);
         AddWidget(scrollBars_[ScrollBar::VERTICAL]);
         AddWidget(scrollBars_[ScrollBar::HORIZONTAL]);
@@ -34,7 +37,19 @@ namespace OGUI
 
     void Window::ToggleScrollBar(ScrollBar::ScrollBarType type, bool val)
     {
-        scrollBars_[type]->SetVisible(val);
+        switch (type)
+        {
+        case OGUI::ScrollBar::VERTICAL:
+            verticalScroll_ = val;
+            break;
+        case OGUI::ScrollBar::HORIZONTAL:
+            horizontalScroll_ = val;
+            break;
+        default:
+            assert(0);
+            break;
+        }
+        RecalcContents();
     }
 
     void Window::AddWidget(SmartPtr<Widget> widget)
@@ -73,7 +88,15 @@ namespace OGUI
                 totalHeight_ = y;
             }
         }
-        scrollBars_[ScrollBar::VERTICAL]->SetPosition(scrollTop_ / totalHeight_, 1.0f / totalHeight_);
+        if (totalHeight_ > 1.0f) {
+            scrollBars_[ScrollBar::VERTICAL]->SetVisible(verticalScroll_);
+            scrollBars_[ScrollBar::VERTICAL]->SetPosition(scrollTop_ / totalHeight_, 1.0f / totalHeight_);
+        } else {
+            scrollBars_[ScrollBar::VERTICAL]->SetVisible(false);
+            if (scrollTop_ > 0) {
+                Scroll(0, scrollTop_);
+            }
+        }
     }
 
     void Window::OnChildMove(Widget* w)
@@ -99,31 +122,31 @@ namespace OGUI
         wnd_(wnd),
         y_(0),
         height_(1.0f),
-        positionUVs_({369, 41, 16, 5})
+        positionUVs_({201, 41, 16, 5})
     {
         visible_ = false;
         clickable_ = true;
         Renderer& renderer = Renderer::GetInstance();
         renderer.InitUVs(positionUVs_, Renderer::TEX_GUI);
-        Init({351, 351, 366, 366, 40, 40, 46, 46});
+        Init({ 183, 183, 198, 198, 40, 40, 46, 46 });
         switch (type)
         {
         case OGUI::ScrollBar::VERTICAL:
             arrow1_ = new Button({ 0.0f, 0.0f, 1.0f, 0.1f });
-            arrow1_->Init({351, 351, 367, 367, 22, 22, 38, 38});
+            arrow1_->Init({ 183, 185, 196, 199, 22, 22, 38, 38 });
             AddWidget(arrow1_);
             arrow1_->F = bind(&ScrollBar::ScrollUp, this);
             arrow2_ = new Button({ 0.0f, 0.9f, 1.0f, 0.1f });
-            arrow2_->Init({ 351, 351, 367, 367, 38, 38, 22, 22 });
+            arrow2_->Init({ 183, 185, 196, 199, 38, 38, 22, 22 });
             AddWidget(arrow2_);
             arrow2_->F = bind(&ScrollBar::ScrollDown, this);
             break;
         case OGUI::ScrollBar::HORIZONTAL:
             arrow1_ = new Button({ 0.0f, 0.0f, 0.1f, 1.0f });
-            arrow1_->Init({ 385, 385, 369, 369, 22, 22, 38, 38 });
+            arrow1_->Init({ 201, 203, 214, 216, 22, 22, 38, 38 });
             AddWidget(arrow1_);
             arrow2_ = new Button({ 0.9f, 0.0f, 0.1f, 1.0f });
-            arrow2_->Init({ 369, 369, 385, 385, 22, 22, 38, 38 });
+            arrow2_->Init({ 216, 214, 203, 201, 22, 22, 38, 38 });
             AddWidget(arrow2_);
             break;
         default:
