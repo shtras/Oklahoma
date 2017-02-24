@@ -158,7 +158,7 @@ namespace OGUI {
                     Erase();
                     c = GetChar(c, event.key.keysym);
                     text_[cursorY_].insert(cursorX_, 1, c);
-                    ++cursorX_;
+                    MoveCursor(cursorX_ + 1, cursorY_, false);
                 }
                 break;
             }
