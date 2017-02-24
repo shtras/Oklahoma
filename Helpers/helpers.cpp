@@ -13,4 +13,14 @@ namespace OHelpers
         return (attribs & FILE_ATTRIBUTE_DIRECTORY) != 0;
     }
 
+    void Clamp(int& val, int minVal, int maxVal)
+    {
+        if (val < minVal) {
+            val = minVal;
+        }
+        if (val > maxVal) {
+            val = maxVal;
+        }
+    }
+
 }
