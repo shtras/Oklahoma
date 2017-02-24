@@ -33,7 +33,7 @@ int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance
     Oklahoma& oklahoma = Oklahoma::GetInstance();
     oklahoma.Init();
     oklahoma.Run();
-    LogInfo(L"Bye.\n\n");
+    LogInfo(L"Bye.");
 
 #ifdef DEBUG
     FreeConsole();
@@ -79,10 +79,10 @@ void Oklahoma::Run()
     
     Window* w = new Window({ 0.1f, 0.1f, 0.5f, 0.5f });
     w->ToggleScrollBar(ScrollBar::VERTICAL, true);
-    //     Button* btn = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
-    //     btn->F = bind(&Oklahoma::Quit, this);
-    //     btn->SetText(L"OK!");
-    //     w->AddWidget(btn);
+    Button* btn = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
+    btn->F = bind(&Oklahoma::Quit, this);
+    btn->SetText(L"OK!");
+    w->AddWidget(btn);
 
     Window* w1 = new Window({ 0.1f, 0.1f, 0.8f, 0.6f });
     //w1->SetDraggable(false);

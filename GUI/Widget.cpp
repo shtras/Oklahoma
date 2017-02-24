@@ -4,6 +4,7 @@
 
 namespace OGUI
 {
+    static int NumWidgets = 0;
     Widget::Widget(Rect pos) :
         pos_(pos),
         hovered_(false),
@@ -20,10 +21,15 @@ namespace OGUI
         keyboardListener_(false),
         parent_(nullptr)
     {
+        ++NumWidgets;
     }
 
     Widget::~Widget()
     {
+        --NumWidgets;
+        if (NumWidgets == 0) {
+            LogDebug(L"All widgets destroyed");
+        }
     }
 
     void Widget::Init(TexturePos texPos)

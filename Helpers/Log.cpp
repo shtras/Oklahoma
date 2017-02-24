@@ -47,6 +47,7 @@ namespace ODiagnostics
 
     Logger::~Logger()
     {
+        fwprintf_s(file_, L"\n\n");
         if (file_) {
             fclose(file_);
             file_ = nullptr;
