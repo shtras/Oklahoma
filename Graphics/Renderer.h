@@ -61,6 +61,7 @@ namespace OGraphics
         void FLush();
         void Destroy();
         void AddVertex(const Vertex& v, const UV& uv);
+        void AddVertex(int didx);
         void Clear();
         void LoadTexture(const char* path, TextureType type);
         void LoadShader(const wchar_t* vert, const wchar_t* frag, ShaderType type);

@@ -4,7 +4,6 @@
 
 namespace OGUI
 {
-
     Widget::Widget(Rect pos) :
         pos_(pos),
         hovered_(false),

@@ -101,6 +101,7 @@ void Oklahoma::Run()
 
     mainWindow.AddWidget(w);
 
+    //PerfTest();
     Label* fpsText = new Label({ 0.0f, 0.9f, 0.1f, 0.1f });
     mainWindow.AddWidget(fpsText);
     while (running_) {

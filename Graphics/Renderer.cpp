@@ -300,10 +300,11 @@ namespace OGraphics
         AddVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
         AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
         AddVertex({ pos.left + pos.width, pos.top, 0 }, { tex.left + tex.width, tex.top });
-
-        AddVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
+        //AddVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
+        AddVertex(-3);
         AddVertex({ pos.left, pos.top + pos.height, 0 }, { tex.left, tex.top + tex.height });
-        AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
+        //AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
+        AddVertex(-3);
         ++dbgRects_;
     }
 
@@ -318,16 +319,15 @@ namespace OGraphics
             LogError(L"No active texture");
             assert(0);
         }
-//         for (int i = 0; i < numVertices_; ++i) {
-//             if (vertices_[i] == v && uvs_[i] == uv) {
-//                 indexes_[numIndexes_++] = i;
-//                 return;
-//             }
-//         }
         vertices_[numVertices_] = v;
         uvs_[numVertices_++] = uv;
         indexes_[numIndexes_++] = numVertices_ - 1;
         ++dbgVertices_;
+    }
+
+    void Renderer::AddVertex(int didx)
+    {
+        indexes_[numIndexes_++] = numVertices_ + didx;
     }
 
     void Renderer::RenderText(const wchar_t* text, float x, float y)
