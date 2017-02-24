@@ -10,24 +10,33 @@ namespace OGUI
         ~TextInput();
         void Render() override;
         void HandleKeyboardEvent(SDL_Event& event);
+        void SetMultiline(bool val);
     protected:
         void Erase();
-        void MoveCursor(int x, bool shift);
+        void MoveCursor(int x, int y, bool shift);
         void HandleMouseEventSelf(SDL_Event& event, float x, float y) override;
         void HandleMouseDown(float x, float y) override;
-        int GetCharPos(float x, float y);
+        void GetCharPos(float fx, float fy, int& x, int& y);
         int FindWordBoundary(int dx);
         bool IsShift(SDL_Keysym& event);
         bool IsCtrl(SDL_Keysym& event);
         bool IsWordChar(wchar_t c);
-        wstring text_;
+        void GetPosition(int x, int y, float* fx, float* fy);
+        bool HasSelection();
+        vector<wstring> text_;
         wchar_t GetChar(wchar_t c, SDL_Keysym& sym);
         map<wchar_t, wchar_t> shiftChars_;
         int cursorX_;
-        int selectStart_;
-        int selectEnd_;
+        int cursorY_;
+        int selectStartX_;
+        int selectEndX_;
+        int selectStartY_;
+        int selectEndY_;
         Rect cursorUVs_;
         Rect selectionUVs_;
         set<wchar_t> wordChars_;
+        int charWidth_;
+        int charHeight_;
+        bool multiline_;
     };
 }

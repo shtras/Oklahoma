@@ -364,8 +364,16 @@ namespace OGraphics
 
     void Renderer::SetCharSize(int width, int height)
     {
+        charWidthLast_ = charWidth_;
+        charHeightLast_ = charHeight_;
         charWidth_ = width / (float)width_;
         charHeight_ = height / (float)height_;
+    }
+
+    void Renderer::ResetCharSize()
+    {
+        charWidth_ = charWidthLast_;
+        charHeight_ = charHeightLast_;
     }
 
     const Texture* Renderer::GetTexture(TextureType type)

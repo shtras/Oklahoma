@@ -5,9 +5,15 @@ namespace OGUI {
     TextInput::TextInput(Rect pos):
         Widget(pos),
         cursorX_(0),
-        selectStart_(0),
-        selectEnd_(0),
-        selectionUVs_({20, 177, 15, 9})
+        cursorY_(0),
+        selectStartX_(0),
+        selectEndX_(0),
+        selectStartY_(0),
+        selectEndY_(0),
+        selectionUVs_({20, 177, 15, 9}),
+        charWidth_(10),
+        charHeight_(20),
+        multiline_(false)
     {
         Init({ 168, 172, 184, 187, 2, 4, 16, 19 });
         clickable_ = true;
@@ -28,6 +34,7 @@ namespace OGUI {
         for (int i = 0; i < strWordChars.length(); ++i) {
             wordChars_.insert(strWordChars[i]);
         }
+        text_.push_back(L"");
     }
 
     TextInput::~TextInput()
@@ -39,21 +46,41 @@ namespace OGUI {
     {
         Renderer& renderer = Renderer::GetInstance();
         Widget::Render();
-        renderer.RenderText(text_.c_str(), pos_.left, pos_.top);
+        renderer.SetCharSize(charWidth_, charHeight_);
+        for (int i = 0; i < text_.size(); ++i) {
+            renderer.RenderText(text_[i].c_str(), pos_.left, pos_.top + i * charHeight_ * renderer.GetPixelHeight());
+        }
         if (keyFocus_) {
-            Rect cursorPos = { pos_.left + (20 * cursorX_ - 5) / (float)renderer.GetWidth(), pos_.top, 0.01f, pos_.height };
+            Rect cursorPos = { 0.0f, 0.0f, 10 * renderer.GetPixelWidth(), charHeight_*renderer.GetPixelHeight() };
+            GetPosition(cursorX_, cursorY_, &cursorPos.left, &cursorPos.top);
             renderer.SetTexture(Renderer::TEX_FONT);
             renderer.RenderRect(cursorPos, cursorUVs_);
-            if (selectStart_ != selectEnd_) {
-                int x1 = selectStart_;
-                int x2 = selectEnd_;
-                if (x2 < x1) {
+            if (HasSelection()) {
+                int x1 = selectStartX_;
+                int x2 = selectEndX_;
+                int y1 = selectStartY_;
+                int y2 = selectEndY_;
+                if (y1 > y2) {
+                    swap(y1, y2);
                     swap(x1, x2);
                 }
-                Rect selectionPos = { pos_.left + 20 * x1 / (float)renderer.GetWidth(), pos_.top, 20 * (x2 - x1) / (float)renderer.GetWidth(), pos_.height };
-                renderer.RenderRect(selectionPos, selectionUVs_);
+                if (y1 == y2 && x2 < x1) {
+                    swap(x1, x2);
+                }
+                for (int y = y1; y <= y2; ++y) {
+                    Rect selectionPos = { pos_.left, pos_.top + y * charHeight_ * renderer.GetPixelHeight(), charWidth_ * text_[y].length() * renderer.GetPixelWidth(), charHeight_ * renderer.GetPixelHeight() };
+                    if (y == y1) {
+                        selectionPos.left += x1 * charWidth_ * renderer.GetPixelWidth();
+                        selectionPos.width -= x1 * charWidth_ * renderer.GetPixelWidth();
+                    }
+                    if (y == y2) {
+                        selectionPos.width -= (text_[y].length() - x2) * charWidth_ * renderer.GetPixelWidth();
+                    }
+                    renderer.RenderRect(selectionPos, selectionUVs_);
+                }
             }
         }
+        renderer.ResetCharSize();
     }
 
     void TextInput::HandleKeyboardEvent(SDL_Event& event)
@@ -65,38 +92,57 @@ namespace OGUI {
             switch (event.key.keysym.sym)
             {
             case SDLK_BACKSPACE:
-                if (selectStart_ == selectEnd_) {
-                    selectStart_ = cursorX_;
-                    selectEnd_ = cursorX_ - 1;
+                if (!HasSelection()) {
+                    selectStartX_ = cursorX_;
+                    selectStartY_ = cursorY_;
+                    MoveCursor(cursorX_ - 1, cursorY_, true);
                 }
                 Erase();
                 break;
             case SDLK_DELETE:
-                if (selectStart_ == selectEnd_) {
-                    selectStart_ = cursorX_;
-                    selectEnd_ = cursorX_ + 1;
+                if (!HasSelection()) {
+                    selectStartX_ = cursorX_;
+                    selectStartY_ = cursorY_;
+                    MoveCursor(cursorX_ + 1, cursorY_, true);
                 }
                 Erase();
                 break;
             case SDLK_LEFT:
                 if (ctrl) {
-                    MoveCursor(FindWordBoundary(-1), shift);
+                    MoveCursor(FindWordBoundary(-1), cursorY_, shift);
                 } else {
-                    MoveCursor(cursorX_ - 1, shift);
+                    MoveCursor(cursorX_ - 1, cursorY_, shift);
                 }
                 break;
             case SDLK_RIGHT:
                 if (ctrl) {
-                    MoveCursor(FindWordBoundary(1), shift);
+                    MoveCursor(FindWordBoundary(1), cursorY_, shift);
                 } else {
-                    MoveCursor(cursorX_ + 1, shift);
+                    MoveCursor(cursorX_ + 1, cursorY_, shift);
+                }
+                break;
+            case SDLK_UP:
+                if (multiline_) {
+                    MoveCursor(cursorX_, cursorY_ - 1, shift);
+                }
+                break;
+            case SDLK_DOWN:
+                if (multiline_) {
+                    MoveCursor(cursorX_, cursorY_ + 1, shift);
                 }
                 break;
             case SDLK_HOME:
-                MoveCursor(0, shift);
+                MoveCursor(0, cursorY_, shift);
                 break;
             case SDLK_END:
-                MoveCursor((int)text_.length(), shift);
+                MoveCursor((int)text_[cursorY_].length(), cursorY_, shift);
+                break;
+            case SDLK_RETURN:
+                if (multiline_) {
+                    text_.insert(text_.begin() + cursorY_ + 1, text_[cursorY_].substr(cursorX_));
+                    text_[cursorY_].erase(cursorX_);
+                    MoveCursor(0, cursorY_ + 1, false);
+                }
                 break;
             default:
                 if (event.key.keysym.sym & SDLK_SCANCODE_MASK) {
@@ -111,7 +157,7 @@ namespace OGUI {
                 if (Renderer::GetInstance().IsFontSymbol(c)) {
                     Erase();
                     c = GetChar(c, event.key.keysym);
-                    text_.insert(cursorX_, 1, c);
+                    text_[cursorY_].insert(cursorX_, 1, c);
                     ++cursorX_;
                 }
                 break;
@@ -119,32 +165,70 @@ namespace OGUI {
         }
     }
 
-    void TextInput::Erase()
+    void TextInput::SetMultiline(bool val)
     {
-        if (selectStart_ == selectEnd_) {
-            return;
+        multiline_ = val;
+        if (!val && text_.size() > 1) {
+            assert(0);
         }
-        int startX = selectStart_;
-        int endX = selectEnd_;
-        OHelpers::Clamp(startX, 0, (int)text_.length());
-        OHelpers::Clamp(endX, 0, (int)text_.length());
-        if (startX > endX) {
-            swap(startX, endX);
-        }
-        text_.erase(startX, endX - startX);
-        selectEnd_ = selectStart_;
-        MoveCursor(startX, false);
     }
 
-    void TextInput::MoveCursor(int x, bool shift)
+    void TextInput::Erase()
     {
-        OHelpers::Clamp(x, 0, (int)text_.length());
-        cursorX_ = x;
-        if (shift) {
-            selectEnd_ = cursorX_;
-        } else {
-            selectStart_ = selectEnd_ = cursorX_;
+        if (!HasSelection()) {
+            return;
         }
+        int startY = selectStartY_;
+        int endY = selectEndY_;
+        int startX = selectStartX_;
+        int endX = selectEndX_;
+        if (endY < startY) {
+            swap(startY, endY);
+            swap(startX, endX);
+        }
+
+        if (selectStartX_ > selectEndX_) {
+            swap(selectStartX_, selectEndX_);
+        }
+
+        if (startY != endY) {
+            text_[startY].erase(startX);
+            text_[endY].erase(0, endX);
+            text_[startY] += text_[endY];
+            text_.erase(text_.begin() + startY + 1, text_.begin() + endY + 1);
+        } else {
+            text_[selectStartY_].erase(selectStartX_, selectEndX_ - selectStartX_);
+        }
+
+        selectEndX_ = selectStartX_;
+        selectEndY_ = selectStartY_;
+        MoveCursor(selectStartX_, selectStartY_, false);
+    }
+
+    void TextInput::MoveCursor(int x, int y, bool shift)
+    {
+        if (!multiline_) {
+            y = 0;
+        }
+        if (x < 0 && y > 0) {
+            x = (int)text_[cursorY_ - 1].length();
+            --y;
+        } else if (x > 0 && cursorY_ < text_.size() && x > text_[cursorY_].length() && y < text_.size() - 1) {
+            x = 0;
+            ++y;
+        }
+        OHelpers::Clamp(y, 0, (int)text_.size() - 1);
+        OHelpers::Clamp(x, 0, (int)text_[y].length());
+
+        if (shift) {
+            selectEndX_ = x;
+            selectEndY_ = y;
+        } else {
+            selectStartX_ = selectEndX_ = x;
+            selectStartY_ = selectEndY_ = y;
+        }
+        cursorX_ = x;
+        cursorY_ = y;
     }
 
     void TextInput::HandleMouseEventSelf(SDL_Event& event, float x, float y)
@@ -153,7 +237,9 @@ namespace OGUI {
         {
         case SDL_MOUSEMOTION:
             if (pressed_) {
-                MoveCursor(GetCharPos(x, y), true);
+                int cx, cy;
+                GetCharPos(x, y, cx, cy);
+                MoveCursor(cx, cy, true);
             }
             break;
         default:
@@ -164,13 +250,16 @@ namespace OGUI {
 
     void TextInput::HandleMouseDown(float x, float y)
     {
-        MoveCursor(GetCharPos(x, y), false);
+        int cx, cy;
+        GetCharPos(x, y, cx, cy);
+        MoveCursor(cx, cy, false);
         Widget::HandleMouseDown(x, y);
     }
 
-    int TextInput::GetCharPos(float x, float y)
+    void TextInput::GetCharPos(float fx, float fy, int& x, int& y)
     {
-        return (int)((x - pos_.left) / (20 * Renderer::GetInstance().GetPixelWidth()));
+        x = (int)((fx - pos_.left) / (charWidth_ * Renderer::GetInstance().GetPixelWidth()));
+        y = (int)((fy - pos_.top) / (charHeight_ * Renderer::GetInstance().GetPixelHeight()));
     }
 
     int TextInput::FindWordBoundary(int dx)
@@ -179,13 +268,13 @@ namespace OGUI {
         bool inSpaces = false;
         for (res = cursorX_; ;) {
             res += dx;
-            if (res <= 0 || res >= text_.length()) {
+            if (res <= 0 || res >= text_[cursorY_].length()) {
                 break;
             }
-            if (!IsWordChar(text_[res])) {
+            if (!IsWordChar(text_[cursorY_][res])) {
                 break;
             }
-            if (text_[res] == L' ') {
+            if (text_[cursorY_][res] == L' ') {
                 if (!inSpaces) {
                     inSpaces = true;
                 }
@@ -210,6 +299,18 @@ namespace OGUI {
     bool TextInput::IsWordChar(wchar_t c)
     {
         return wordChars_.count(c) > 0;
+    }
+
+    void TextInput::GetPosition(int x, int y, float* fx, float* fy)
+    {
+        Renderer& renderer = Renderer::GetInstance();
+        *fx = pos_.left + x * charWidth_ * renderer.GetPixelWidth();
+        *fy = pos_.top + y * charHeight_ * renderer.GetPixelHeight();
+    }
+
+    bool TextInput::HasSelection()
+    {
+        return selectStartX_ != selectEndX_ || selectStartY_ != selectEndY_;
     }
 
     wchar_t TextInput::GetChar(wchar_t c, SDL_Keysym& sym)

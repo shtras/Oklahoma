@@ -84,19 +84,23 @@ void Oklahoma::Run()
     btn->SetText(L"OK!");
     w->AddWidget(btn);
 
-    Window* w1 = new Window({ 0.1f, 0.3f, 0.8f, 0.4f });
-    w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
-    for (int i = 0; i < 15; ++i) {
-        Label* l = new Label({ 0.1f, i * 0.15f, 0.8f, 0.15f });
-        wchar_t txt[128];
-        swprintf_s(txt, L"Labeliko # %d", i);
-        l->SetText(txt);
-        w1->AddWidget(l);
-    }
-    w->AddWidget(w1);
+//     Window* w1 = new Window({ 0.1f, 0.3f, 0.8f, 0.4f });
+//     w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
+//     for (int i = 0; i < 15; ++i) {
+//         Label* l = new Label({ 0.1f, i * 0.15f, 0.8f, 0.15f });
+//         wchar_t txt[128];
+//         swprintf_s(txt, L"Labeliko # %d", i);
+//         l->SetText(txt);
+//         w1->AddWidget(l);
+//     }
+//     w->AddWidget(w1);
 
-    SmartPtr<Widget> inp = new TextInput({0.1f, 0.1f, 0.8f, 0.1f});
+    TextInput* inp = new TextInput({0.1f, 0.1f, 0.8f, 0.5f});
+    inp->SetMultiline(true);
     w->AddWidget(inp);
+
+    TextInput* inp1 = new TextInput({ 0.1f, 0.7f, 0.8f, 0.1f });
+    w->AddWidget(inp1);
 
     mainWindow.AddWidget(w);
 

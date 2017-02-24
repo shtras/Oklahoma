@@ -47,6 +47,7 @@ namespace OGraphics
         void SetTexture(TextureType tex);
         void SetShader(ShaderType shader);
         void SetCharSize(int width, int height);
+        void ResetCharSize();
         const Texture* GetTexture(TextureType type);
         int GetWidth() const;
         int GetHeight() const;
@@ -82,6 +83,8 @@ namespace OGraphics
         int height_;
         float charWidth_;
         float charHeight_;
+        float charWidthLast_;
+        float charHeightLast_;
         list<Rect> boundRectQueue_;
 
         glm::mat4 mvp_;
