@@ -27,10 +27,9 @@ namespace OGUI
 
     void Window::Render()
     {
-        Renderer::GetInstance().SetBound(pos_);
+        Renderer::GetInstance().PushBound(pos_);
         Widget::Render();
-        
-        Renderer::GetInstance().ResetBound();
+        Renderer::GetInstance().PopBound();
     }
 
     void Window::ToggleScrollBar(ScrollBar::ScrollBarType type, bool val)
@@ -75,6 +74,11 @@ namespace OGUI
             }
         }
         scrollBars_[ScrollBar::VERTICAL]->SetPosition(scrollTop_ / totalHeight_, 1.0f / totalHeight_);
+    }
+
+    void Window::OnChildMove(Widget* w)
+    {
+        RecalcContents();
     }
 
     ScrollBar::ScrollBar(Window* wnd, Rect pos, ScrollBarType type) :

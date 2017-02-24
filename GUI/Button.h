@@ -9,12 +9,12 @@ namespace OGUI
     public:
         Button(Rect pos);
         ~Button();
-        void SetText(wstring& str) override;
-        void SetText(const wchar_t* str) override;
+        void SetText(wstring& str);
+        void SetText(const wchar_t* str);
         void OnClick() override;
         void Bind();
         std::function<void(void)> F;
     protected:
-        SmartPtr<Widget> label_;
+        Label* label_;
     };
 }

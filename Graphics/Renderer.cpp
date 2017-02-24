@@ -165,8 +165,7 @@ namespace OGraphics
         height_(720),
         dbgFlushes_(0),
         dbgVertices_(0),
-        dbgRects_(0),
-        boundRect_({ -1.0f, -1.0f, 2.0f, 2.0f })
+        dbgRects_(0)
     {
 
     }
@@ -185,7 +184,6 @@ namespace OGraphics
     void Renderer::StartFrame()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        ResetBound();
     }
 
     void Renderer::RenderFrame()
@@ -244,6 +242,7 @@ namespace OGraphics
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glActiveTexture(GL_TEXTURE0);
+        boundRectQueue_.push_back({ -1.0f, -1.0f, 2.0f, 2.0f });
     }
 
     void Renderer::FLush()
@@ -267,7 +266,8 @@ namespace OGraphics
         GLuint boundLocation = glGetUniformLocation(programID, "bound");
         glUseProgram(programID);
         glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, &mvp_[0][0]);
-        glUniform4f(boundLocation, boundRect_.left * 2.0f - 1.0f, (boundRect_.top + boundRect_.height) * -2.0f + 1.0f, (boundRect_.left + boundRect_.width) * 2.0f - 1.0f, boundRect_.top * -2.0f + 1.0f);
+        Rect& boundRect = boundRectQueue_.back();
+        glUniform4f(boundLocation, boundRect.left * 2.0f - 1.0f, (boundRect.top + boundRect.height) * -2.0f + 1.0f, (boundRect.left + boundRect.width) * 2.0f - 1.0f, boundRect.top * -2.0f + 1.0f);
 
         glBindTexture(GL_TEXTURE_2D, textureID);
         glUniform1i(textureLocation, 0);
@@ -388,18 +388,22 @@ namespace OGraphics
         return textUVs_.count(c) > 0;
     }
 
-    void Renderer::SetBound(const Rect& r)
+    void Renderer::PushBound(const Rect& r)
     {
-        if (r == boundRect_) {
-            return;
+        if (r != boundRectQueue_.back()) {
+            FLush();
         }
-        FLush();
-        boundRect_ = r;
+        Rect& newR = boundRectQueue_.back().Intersect(r);
+        boundRectQueue_.push_back(newR);
     }
 
-    void Renderer::ResetBound()
+    void Renderer::PopBound()
     {
-        SetBound({0.0f, 0.0f, 1.0f, 1.0f});
+        Rect r = boundRectQueue_.back();
+        boundRectQueue_.pop_back();
+        //if (r != boundRectQueue_.back()) {
+            FLush();
+        //}
     }
 
     void Renderer::InitUVs(Rect& uvs, TextureType type)

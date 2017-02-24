@@ -233,9 +233,9 @@ namespace OGUI
 
     void Widget::Move(float x, float y, float dx, float dy)
     {
-//         if (!parent_->IsWithin(pos_.left + dx, pos_.top + dy)) {
-//             return;
-//         }
+        if (!parent_->IsWithin(x, y)) {
+            return;
+        }
 //         if (!parent_->IsWithin(pos_.left + pos_.width + dx, pos_.top + pos_.height + dy)) {
 //             return;
 //         }
@@ -252,6 +252,9 @@ namespace OGUI
         pos_.top += dy;
         for (auto& itr : children_) {
             itr->Move(dx, dy);
+        }
+        if (parent_) {
+            parent_->OnChildMove(this);
         }
     }
 
@@ -315,6 +318,11 @@ namespace OGUI
     void Widget::SetVisible(bool value)
     {
         visible_ = value;
+    }
+
+    void Widget::OnChildMove(Widget* w)
+    {
+
     }
 
 }

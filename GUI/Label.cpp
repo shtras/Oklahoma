@@ -26,7 +26,9 @@ namespace OGUI {
 
     void Label::Render()
     {
-        Renderer::GetInstance().RenderText(text_.c_str(), pos_.left, pos_.top);
+        if (text_.length() > 0) {
+            Renderer::GetInstance().RenderText(text_.c_str(), pos_.left, pos_.top);
+        }
     }
 
 }

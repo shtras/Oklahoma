@@ -9,7 +9,7 @@
 #include <map>
 #include <list>
 #include <functional>
-
+#include <algorithm>
 using namespace std;
 
 #include <SDL.h>

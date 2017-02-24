@@ -30,11 +30,10 @@ namespace OGUI
         void SetPressedTexture(int pressedX, int pressedY);
         void Move(float x, float y, float dx, float dy);
 
-        virtual void SetText(wstring& str) { assert(0); };
-        virtual void SetText(const wchar_t* str) { assert(0); };
         virtual void HandleKeyboardEvent(SDL_Event& event) { assert(0); };
         void SetDraggable(bool value);
         void SetVisible(bool value);
+        virtual void OnChildMove(Widget* w);
     protected:
         Widget();
         Widget(const Widget& other);

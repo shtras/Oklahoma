@@ -35,7 +35,7 @@ namespace OGUI
         void ToggleScrollBar(ScrollBar::ScrollBarType type, bool val);
         void AddWidget(SmartPtr<Widget> widget) override;
         void Scroll(float dx, float dy);
-        
+        void OnChildMove(Widget* w) override;
     protected:
         void RecalcContents();
         ScrollBar* scrollBars_[ScrollBar::MAX_TYPE + 1];

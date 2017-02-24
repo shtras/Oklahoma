@@ -51,8 +51,8 @@ namespace OGraphics
         int GetWidth() const;
         int GetHeight() const;
         bool IsFontSymbol(wchar_t) const;
-        void SetBound(const Rect& r);
-        void ResetBound();
+        void PushBound(const Rect& r);
+        void PopBound();
         void InitUVs(Rect& uvs, TextureType type);
     private:
         Renderer();
@@ -79,7 +79,7 @@ namespace OGraphics
         int height_;
         float charWidth_;
         float charHeight_;
-        Rect boundRect_;
+        list<Rect> boundRectQueue_;
 
         glm::mat4 mvp_;
         SmartPtr<Shader> shader_;

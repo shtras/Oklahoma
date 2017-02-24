@@ -56,17 +56,17 @@ void Oklahoma::Run()
     Renderer& renderer = Renderer::GetInstance();
     MainWindow& mainWindow = MainWindow::GetInstance();
     
-    SmartPtr<Widget> w = new Window({ 0.1f, 0.1f, 0.5f, 0.5f });
-
-    Button* btn = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
-    btn->F = bind(&Oklahoma::Quit, this);
-    btn->SetText(L"OK!");
-    w->AddWidget(btn);
+    Window* w = new Window({ 0.1f, 0.1f, 0.5f, 0.5f });
+    w->ToggleScrollBar(ScrollBar::VERTICAL, true);
+//     Button* btn = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
+//     btn->F = bind(&Oklahoma::Quit, this);
+//     btn->SetText(L"OK!");
+//     w->AddWidget(btn);
 
      Window* w1 = new Window({ 0.1f, 0.1f, 0.8f, 0.6f });
-     w1->SetDraggable(false);
+     //w1->SetDraggable(false);
      w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
-     for (int i = 0; i < 20; ++i) {
+     for (int i = 0; i < 1; ++i) {
          Label* l = new Label({ 0.1f, i * 0.15f, 0.8f, 0.15f });
          wchar_t txt[128];
          swprintf_s(txt, L"Labeliko # %d", i);
@@ -80,7 +80,7 @@ void Oklahoma::Run()
 
     mainWindow.AddWidget(w);
 
-    SmartPtr<Widget> fpsText = new Label({ 0.0f, 0.9f, 0.1f, 0.1f });
+    Label* fpsText = new Label({ 0.0f, 0.9f, 0.1f, 0.1f });
     mainWindow.AddWidget(fpsText);
     while (running_) {
         SDL_Event event;
