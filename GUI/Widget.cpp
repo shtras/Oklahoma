@@ -60,7 +60,7 @@ namespace OGUI
         texState_ |= PRESSED;
     }
 
-    void Widget::CreateUVs(WidgetRects& uvs, TexturePos& texPos)
+    void Widget::CreateUVs(OGraphics::Rect* uvs, TexturePos& texPos)
     {
         Renderer& renderer = Renderer::GetInstance();
         int width = renderer.GetWidth();
@@ -75,17 +75,17 @@ namespace OGUI
         float ft2 = texPos.t2 / (float)tex->GetHeight();
         float ft3 = texPos.t3 / (float)tex->GetHeight();
         float ft4 = texPos.t4 / (float)tex->GetHeight();
-        uvs.topLeft = { fl1, ft1, fl2 - fl1, ft2 - ft1 };
-        uvs.top = { fl2, ft1, fl3 - fl2, ft2 - ft1 };
-        uvs.topRight = { fl3, ft1, fl4 - fl3, ft2 - ft1 };
+        uvs[0] = { fl1, ft1, fl2 - fl1, ft2 - ft1 };
+        uvs[1] = { fl2, ft1, fl3 - fl2, ft2 - ft1 };
+        uvs[2] = { fl3, ft1, fl4 - fl3, ft2 - ft1 };
 
-        uvs.left = { fl1, ft2, fl2 - fl1, ft3 - ft2 };
-        uvs.center = { fl2, ft2, fl3 - fl2, ft3 - ft2 };
-        uvs.right = { fl3, ft2, fl4 - fl3, ft3 - ft2 };
+        uvs[3] = { fl1, ft2, fl2 - fl1, ft3 - ft2 };
+        uvs[4] = { fl2, ft2, fl3 - fl2, ft3 - ft2 };
+        uvs[5] = { fl3, ft2, fl4 - fl3, ft3 - ft2 };
 
-        uvs.bottomLeft = { fl1, ft3, fl2 - fl1, ft4 - ft3 };
-        uvs.bottom = { fl2, ft3, fl3 - fl2, ft4 - ft3 };
-        uvs.bottomRight = { fl3, ft3, fl4 - fl3, ft4 - ft3 };
+        uvs[6] = { fl1, ft3, fl2 - fl1, ft4 - ft3 };
+        uvs[7] = { fl2, ft3, fl3 - fl2, ft4 - ft3 };
+        uvs[8] = { fl3, ft3, fl4 - fl3, ft4 - ft3 };
     }
 
     void Widget::CreateRects()
@@ -123,23 +123,17 @@ namespace OGUI
         }
         Renderer& renderer = Renderer::GetInstance();
         if (texState_ != NONE) {
-            WidgetRects* uvs = &uvs_;
+            OGraphics::Rect* uvs = uvs_;
             if (hovered_ && (texState_ & HOVERED)) {
-                uvs = &hoveredUVs_;
+                uvs = hoveredUVs_;
             }
             if (pressed_ && (texState_ & PRESSED)) {
-                uvs = &pressedUVs_;
+                uvs = pressedUVs_;
             }
             renderer.SetTexture(Renderer::TEX_GUI);
-            renderer.RenderRect(rects_[0], uvs->topLeft);
-            renderer.RenderRect(rects_[1], uvs->top);
-            renderer.RenderRect(rects_[2], uvs->topRight);
-            renderer.RenderRect(rects_[3], uvs->left);
-            renderer.RenderRect(rects_[4], uvs->center);
-            renderer.RenderRect(rects_[5], uvs->right);
-            renderer.RenderRect(rects_[6], uvs->bottomLeft);
-            renderer.RenderRect(rects_[7], uvs->bottom);
-            renderer.RenderRect(rects_[8], uvs->bottomRight);
+            for (int i = 0; i < 9; ++i) {
+                renderer.RenderRect(rects_[i], uvs[i]);
+            }
         }
         RenderChildren();
     }

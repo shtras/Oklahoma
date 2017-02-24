@@ -37,7 +37,7 @@ namespace OGUI
     protected:
         Widget();
         Widget(const Widget& other);
-        void CreateUVs(WidgetRects& uvs, TexturePos& texPos);
+        void CreateUVs(OGraphics::Rect* uvs, TexturePos& texPos);
         void CreateRects();
         void Resize(Rect containingRect);
         void RenderChildren();
@@ -51,9 +51,9 @@ namespace OGUI
         virtual void OnClick() { };
         Rect pos_;
         TexturePos texPos_;
-        WidgetRects uvs_;
-        WidgetRects hoveredUVs_;
-        WidgetRects pressedUVs_;
+        OGraphics::Rect uvs_[9];
+        OGraphics::Rect hoveredUVs_[9];
+        OGraphics::Rect pressedUVs_[9];
         OGraphics::Rect rects_[9];
         list<SmartPtr<Widget>> children_;
         int texState_;

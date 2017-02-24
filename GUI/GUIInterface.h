@@ -35,9 +35,4 @@ namespace OGUI
     {
         int l1, l2, l3, l4, t1, t2, t3, t4;
     };
-
-    struct WidgetRects
-    {
-        OGraphics::Rect topLeft, top, topRight, left, center, right, bottomLeft, bottom, bottomRight;
-    };
 }
