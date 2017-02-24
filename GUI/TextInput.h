@@ -13,6 +13,13 @@ namespace OGUI
     protected:
         void Erase();
         void MoveCursor(int x, bool shift);
+        void HandleMouseEventSelf(SDL_Event& event, float x, float y) override;
+        void HandleMouseDown(float x, float y) override;
+        int GetCharPos(float x, float y);
+        int FindWordBoundary(int dx);
+        bool IsShift(SDL_Event& event);
+        bool IsCtrl(SDL_Event& event);
+        bool IsWordChar(wchar_t c);
         wstring text_;
         wchar_t GetChar(SDL_Keysym& sym);
         map<wchar_t, wchar_t> shiftChars_;
@@ -21,5 +28,6 @@ namespace OGUI
         int selectEnd_;
         Rect cursorUVs_;
         Rect selectionUVs_;
+        set<wchar_t> wordChars_;
     };
 }

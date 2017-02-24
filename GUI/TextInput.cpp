@@ -7,7 +7,7 @@ namespace OGUI {
         cursorX_(0),
         selectStart_(0),
         selectEnd_(0),
-        selectionUVs_({19, 177, 16, 9})
+        selectionUVs_({20, 177, 15, 9})
     {
         Init({ 168, 172, 184, 187, 2, 4, 16, 19 });
         clickable_ = true;
@@ -24,6 +24,10 @@ namespace OGUI {
         cursorUVs_ = { 5, 176, 12, 22 };
         Renderer::GetInstance().InitUVs(cursorUVs_, Renderer::TEX_FONT);
         Renderer::GetInstance().InitUVs(selectionUVs_, Renderer::TEX_FONT);
+        wstring strWordChars = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
+        for (int i = 0; i < strWordChars.length(); ++i) {
+            wordChars_.insert(strWordChars[i]);
+        }
     }
 
     TextInput::~TextInput()
@@ -37,7 +41,7 @@ namespace OGUI {
         Widget::Render();
         renderer.RenderText(text_.c_str(), pos_.left, pos_.top);
         if (keyFocus_) {
-            Rect cursorPos = { pos_.left + 20 * cursorX_ / (float)renderer.GetWidth(), pos_.top, 0.01f, pos_.height };
+            Rect cursorPos = { pos_.left + (20 * cursorX_ - 5) / (float)renderer.GetWidth(), pos_.top, 0.01f, pos_.height };
             renderer.SetTexture(Renderer::TEX_FONT);
             renderer.RenderRect(cursorPos, cursorUVs_);
             if (selectStart_ != selectEnd_) {
@@ -55,7 +59,8 @@ namespace OGUI {
     void TextInput::HandleKeyboardEvent(SDL_Event& event)
     {
         if (event.key.type == SDL_KEYDOWN) {
-            bool shift = (event.key.keysym.mod & SDLK_LSHIFT) || (event.key.keysym.mod & SDLK_RSHIFT);
+            bool shift = IsShift(event);
+            bool ctrl = IsCtrl(event);
             switch (event.key.keysym.sym)
             {
             case SDLK_BACKSPACE:
@@ -73,10 +78,18 @@ namespace OGUI {
                 Erase();
                 break;
             case SDLK_LEFT:
-                MoveCursor(cursorX_ - 1, shift);
+                if (ctrl) {
+                    MoveCursor(FindWordBoundary(-1), shift);
+                } else {
+                    MoveCursor(cursorX_ - 1, shift);
+                }
                 break;
             case SDLK_RIGHT:
-                MoveCursor(cursorX_ + 1, shift);
+                if (ctrl) {
+                    MoveCursor(FindWordBoundary(1), shift);
+                } else {
+                    MoveCursor(cursorX_ + 1, shift);
+                }
                 break;
             case SDLK_HOME:
                 MoveCursor(0, shift);
@@ -86,6 +99,7 @@ namespace OGUI {
                 break;
             default:
                 if (Renderer::GetInstance().IsFontSymbol(event.key.keysym.sym)) {
+                    Erase();
                     wchar_t c = GetChar(event.key.keysym);
                     text_.insert(cursorX_, 1, c);
                     ++cursorX_;
@@ -97,6 +111,9 @@ namespace OGUI {
 
     void TextInput::Erase()
     {
+        if (selectStart_ == selectEnd_) {
+            return;
+        }
         int startX = selectStart_;
         int endX = selectEnd_;
         OHelpers::Clamp(startX, 0, (int)text_.length());
@@ -118,6 +135,71 @@ namespace OGUI {
         } else {
             selectStart_ = selectEnd_ = cursorX_;
         }
+    }
+
+    void TextInput::HandleMouseEventSelf(SDL_Event& event, float x, float y)
+    {
+        switch (event.type)
+        {
+        case SDL_MOUSEMOTION:
+            if (pressed_) {
+                MoveCursor(GetCharPos(x, y), true);
+            }
+            break;
+        default:
+            Widget::HandleMouseEventSelf(event, x, y);
+            break;
+        }
+    }
+
+    void TextInput::HandleMouseDown(float x, float y)
+    {
+        MoveCursor(GetCharPos(x, y), false);
+        Widget::HandleMouseDown(x, y);
+    }
+
+    int TextInput::GetCharPos(float x, float y)
+    {
+        return (int)((x - pos_.left) / (20 * Renderer::GetInstance().GetPixelWidth()));
+    }
+
+    int TextInput::FindWordBoundary(int dx)
+    {
+        int res;
+        bool inSpaces = false;
+        for (res = cursorX_; ;) {
+            res += dx;
+            if (res <= 0 || res >= text_.length()) {
+                break;
+            }
+            if (!IsWordChar(text_[res])) {
+                break;
+            }
+            if (text_[res] == L' ') {
+                if (!inSpaces) {
+                    inSpaces = true;
+                }
+            } else if (inSpaces) {
+                res -= dx;
+                break;
+            }
+        }
+        return res;
+    }
+
+    bool TextInput::IsShift(SDL_Event& event)
+    {
+        return (event.key.keysym.mod & KMOD_LSHIFT) || (event.key.keysym.mod & KMOD_RSHIFT);
+    }
+
+    bool TextInput::IsCtrl(SDL_Event& event)
+    {
+        return (event.key.keysym.mod & KMOD_LCTRL) || (event.key.keysym.mod & KMOD_RCTRL);
+    }
+
+    bool TextInput::IsWordChar(wchar_t c)
+    {
+        return wordChars_.count(c) > 0;
     }
 
     wchar_t TextInput::GetChar(SDL_Keysym& sym)
