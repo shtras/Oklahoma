@@ -18,8 +18,8 @@ namespace OGUI {
         for (int i = 0; i < str1.length(); ++i) {
             shiftChars_[str1[i]] = str2[i];
         }
-        cursorUVs_ = { 168, 20, 7, 12 };
-        Renderer::GetInstance().InitUVs(cursorUVs_, Renderer::TEX_GUI);
+        cursorUVs_ = { 5, 176, 12, 22 };
+        Renderer::GetInstance().InitUVs(cursorUVs_, Renderer::TEX_FONT);
     }
 
     TextInput::~TextInput()
@@ -33,7 +33,7 @@ namespace OGUI {
         Renderer::GetInstance().RenderText(text_.c_str(), pos_.left, pos_.top);
         if (keyFocus_) {
             Rect cursorPos = { pos_.left + 20 * cursorX_ / (float)Renderer::GetInstance().GetWidth(), pos_.top, 0.01f, pos_.height };
-            Renderer::GetInstance().SetTexture(Renderer::TEX_GUI);
+            Renderer::GetInstance().SetTexture(Renderer::TEX_FONT);
             Renderer::GetInstance().RenderRect(cursorPos, cursorUVs_);
         }
     }

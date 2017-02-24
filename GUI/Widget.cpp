@@ -153,6 +153,9 @@ namespace OGUI
     void Widget::RenderChildren()
     {
         for (auto& itr : children_) {
+            if (itr->pos_.top > pos_.top + pos_.height) {
+                continue;
+            }
             itr->Render();
         }
     }

@@ -86,7 +86,7 @@ void Oklahoma::Run()
 
     Window* w1 = new Window({ 0.1f, 0.3f, 0.8f, 0.4f });
     w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
-    for (int i = 0; i < 1; ++i) {
+    for (int i = 0; i < 15; ++i) {
         Label* l = new Label({ 0.1f, i * 0.15f, 0.8f, 0.15f });
         wchar_t txt[128];
         swprintf_s(txt, L"Labeliko # %d", i);
