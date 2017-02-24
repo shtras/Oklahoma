@@ -128,7 +128,7 @@ namespace OGUI
         clickable_ = true;
         Renderer& renderer = Renderer::GetInstance();
         renderer.InitUVs(positionUVs_, Renderer::TEX_GUI);
-        Init({ 183, 183, 198, 198, 40, 40, 46, 46 });
+        Init({ 183, 186, 197, 199, 40, 40, 46, 46 });
         switch (type)
         {
         case OGUI::ScrollBar::VERTICAL:

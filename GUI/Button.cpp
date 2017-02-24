@@ -10,7 +10,7 @@ namespace OGUI
     {
         AddWidget(label_);
         Init({ 168, 172, 184, 187, 2, 4, 16, 19 });
-        SetHoveredTexture(189, 2);
+        //SetHoveredTexture(189, 2);
         SetPressedTexture(210, 2);
         clickable_ = true;
     }
