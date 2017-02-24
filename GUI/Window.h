@@ -15,6 +15,7 @@ namespace OGUI
         ~ScrollBar();
         void SetPosition(float y, float height);
         void Render() override;
+        void HandleMouseEventSelf(SDL_Event& event, float x, float y) override;
     protected:
         void ScrollUp();
         void ScrollDown();
@@ -36,6 +37,7 @@ namespace OGUI
         void AddWidget(SmartPtr<Widget> widget) override;
         void Scroll(float dx, float dy);
         void OnChildMove(Widget* w) override;
+        void HandleMouseEventSelf(SDL_Event& event, float x, float y) override;
     protected:
         void RecalcContents();
         ScrollBar* scrollBars_[ScrollBar::MAX_TYPE + 1];

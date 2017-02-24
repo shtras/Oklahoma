@@ -81,6 +81,19 @@ namespace OGUI
         RecalcContents();
     }
 
+    void Window::HandleMouseEventSelf(SDL_Event& event, float x, float y)
+    {
+        switch (event.type)
+        {
+        case SDL_MOUSEWHEEL:
+            Scroll(0, -event.wheel.y / 10.0f);
+            break;
+        default:
+            Widget::HandleMouseEventSelf(event, x, y);
+            break;
+        }
+    }
+
     ScrollBar::ScrollBar(Window* wnd, Rect pos, ScrollBarType type) :
         Widget(pos),
         wnd_(wnd),
@@ -89,6 +102,7 @@ namespace OGUI
         positionUVs_({369, 41, 16, 5})
     {
         visible_ = false;
+        clickable_ = true;
         Renderer& renderer = Renderer::GetInstance();
         renderer.InitUVs(positionUVs_, Renderer::TEX_GUI);
         Init({351, 351, 366, 366, 40, 40, 46, 46});
@@ -144,6 +158,23 @@ namespace OGUI
         Widget::Render();
         Renderer::GetInstance().SetTexture(Renderer::TEX_GUI);
         Renderer::GetInstance().RenderRect({pos_.left, pos_.top + pos_.height*(0.1f + y_), pos_.width, pos_.height * (height_ - 0.2f)}, positionUVs_);
+    }
+
+    void ScrollBar::HandleMouseEventSelf(SDL_Event& event, float x, float y)
+    {
+        Renderer& renderer = Renderer::GetInstance();
+        switch (event.type)
+        {
+        case SDL_MOUSEMOTION:
+            if (pressed_) {
+                float dy = event.motion.yrel / (float)renderer.GetHeight();
+                wnd_->Scroll(0, dy / height_ / pos_.height);
+            }
+            break;
+        default:
+            Widget::HandleMouseEventSelf(event, x, y);
+            break;
+        }
     }
 
     void ScrollBar::ScrollUp()

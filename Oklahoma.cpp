@@ -47,6 +47,27 @@ Oklahoma& Oklahoma::GetInstance()
     return instance;
 }
 
+void PerfTest()
+{
+    MainWindow& mainWindow = MainWindow::GetInstance();
+    for (int i = 0; i < 20; ++i) {
+        for (int j = 0; j < 20; ++j) {
+            Window* w = new Window({ i*0.05f, j*0.05f, 0.05f, 0.05f });
+            mainWindow.AddWidget(w);
+            Window* wItr = w;
+            Window* wItrNext;
+            for (int k = 0; k < 5; ++k) {
+                wItrNext = new Window({ 0.1f, 0.1f, 0.8f, 0.8f });
+                wItr->AddWidget(wItrNext);
+                wItr = wItrNext;
+            }
+            Button* b = new Button({ 0.1f, 0.9f, 0.8f, 0.1f });
+            b->SetText(L"Hello!");
+            wItr->AddWidget(b);
+        }
+    }
+}
+
 void Oklahoma::Run()
 {
     int lastTicks = SDL_GetTicks();
@@ -58,26 +79,22 @@ void Oklahoma::Run()
     
     Window* w = new Window({ 0.1f, 0.1f, 0.5f, 0.5f });
     w->ToggleScrollBar(ScrollBar::VERTICAL, true);
+    //     Button* btn = new Button({ 0.5f, 0.8f, 0.2f, 0.1f });
+    //     btn->F = bind(&Oklahoma::Quit, this);
+    //     btn->SetText(L"OK!");
+    //     w->AddWidget(btn);
 
-     Window* w1 = new Window({ 0.1f, 0.1f, 0.8f, 0.6f });
-     //w1->SetDraggable(false);
-     w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
-     for (int i = 0; i < 15; ++i) {
-         Label* l = new Label({ 0.1f, i * 0.15f, 0.8f, 0.15f });
-         wchar_t txt[128];
-         swprintf_s(txt, L"Labeliko # %d", i);
-         l->SetText(txt);
-         w1->AddWidget(l);
-     }
-     w->AddWidget(w1);
-
-//      Window* w2 = new Window({ 0.1f, 0.1f, 0.8f, 0.6f });
-//      w1->AddWidget(w2);
-
-     Button* btn = new Button({ 0.4f, 0.85f, 0.2f, 0.1f });
-     btn->F = bind(&Oklahoma::Quit, this);
-     btn->SetText(L"OK!");
-     w->AddWidget(btn);
+    Window* w1 = new Window({ 0.1f, 0.1f, 0.8f, 0.6f });
+    //w1->SetDraggable(false);
+    w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
+    for (int i = 0; i < 15; ++i) {
+        Label* l = new Label({ 0.1f, i * 0.15f, 0.8f, 0.15f });
+        wchar_t txt[128];
+        swprintf_s(txt, L"Labeliko # %d", i);
+        l->SetText(txt);
+        w1->AddWidget(l);
+    }
+    w->AddWidget(w1);
 
     //SmartPtr<Widget> inp = new TextInput({0.1f, 0.1f, 0.8f, 0.1f});
     //w->AddWidget(inp);
@@ -97,10 +114,8 @@ void Oklahoma::Run()
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
             case SDL_MOUSEMOTION:
+            case SDL_MOUSEWHEEL:
             {
-                if (event.type == SDL_MOUSEBUTTONUP) {
-                    int a = 0;
-                }
                 float x = event.motion.x / (float)renderer.GetWidth();
                 float y = event.motion.y / (float)renderer.GetHeight();
                 mainWindow.HandleMouseEvent(event, x, y);

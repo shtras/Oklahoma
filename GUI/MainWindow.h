@@ -20,6 +20,8 @@ namespace OGUI
         Widget* pressedWidget_;
         Widget* draggedWidget_;
         Widget* keyboardListenerWidget_;
+        float mx_;
+        float my_;
     };
 
 }

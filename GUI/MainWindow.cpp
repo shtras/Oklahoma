@@ -9,7 +9,9 @@ namespace OGUI
         hoveredWidget_(nullptr),
         pressedWidget_(nullptr),
         draggedWidget_(nullptr),
-        keyboardListenerWidget_(nullptr)
+        keyboardListenerWidget_(nullptr),
+        mx_(0),
+        my_(0)
     {
         clickable_ = false;
         draggable_ = false;
@@ -78,10 +80,18 @@ namespace OGUI
 
     bool MainWindow::HandleMouseEvent(SDL_Event& event, float x, float y)
     {
-        if (draggedWidget_ && event.type == SDL_MOUSEMOTION) {
-            Renderer& renderer = Renderer::GetInstance();
-            draggedWidget_->Move(x, y, event.motion.xrel / (float)renderer.GetWidth(), event.motion.yrel / (float)renderer.GetHeight());
-            return true;
+        if (event.type == SDL_MOUSEMOTION) {
+            mx_ = x;
+            my_ = y;
+            if (draggedWidget_) {
+                Renderer& renderer = Renderer::GetInstance();
+                draggedWidget_->Move(x, y, event.motion.xrel / (float)renderer.GetWidth(), event.motion.yrel / (float)renderer.GetHeight());
+                return true;
+            }
+        }
+        if (event.type == SDL_MOUSEWHEEL) {
+            x = mx_;
+            y = my_;
         }
         return Widget::HandleMouseEvent(event, x, y);
     }
