@@ -93,9 +93,8 @@ namespace OGUI {
             {
             case SDLK_BACKSPACE:
                 if (!HasSelection()) {
-                    selectStartX_ = cursorX_;
-                    selectStartY_ = cursorY_;
-                    MoveCursor(cursorX_ - 1, cursorY_, true);
+					MoveCursor(cursorX_ - 1, cursorY_, false);
+                    MoveCursor(cursorX_ + 1, cursorY_, true);
                 }
                 Erase();
                 break;
@@ -202,7 +201,7 @@ namespace OGUI {
 
         selectEndX_ = selectStartX_;
         selectEndY_ = selectStartY_;
-        MoveCursor(selectStartX_, selectStartY_, false);
+        MoveCursor(startX, selectStartY_, false);
     }
 
     void TextInput::MoveCursor(int x, int y, bool shift)
