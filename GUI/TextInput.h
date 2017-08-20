@@ -23,6 +23,7 @@ namespace OGUI
         bool IsWordChar(wchar_t c);
         void GetPosition(int x, int y, float* fx, float* fy);
         bool HasSelection();
+        void RenderCursor();
         vector<wstring> text_;
         wchar_t GetChar(wchar_t c, SDL_Keysym& sym);
         map<wchar_t, wchar_t> shiftChars_;
@@ -38,5 +39,7 @@ namespace OGUI
         int charWidth_;
         int charHeight_;
         bool multiline_;
+        bool cursorBlink_;
+        
     };
 }

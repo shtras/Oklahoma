@@ -13,7 +13,8 @@ namespace OGUI {
         selectionUVs_({20, 177, 15, 9}),
         charWidth_(10),
         charHeight_(20),
-        multiline_(false)
+        multiline_(false),
+        cursorBlink_(true)
     {
         Init({ 168, 172, 184, 187, 2, 4, 16, 19 });
         clickable_ = true;
@@ -42,6 +43,21 @@ namespace OGUI {
 
     }
 
+    void TextInput::RenderCursor()
+    {
+        if (cursorBlink_) {
+            int ticks = SDL_GetTicks();
+            if (ticks % 1000 > 500) {
+                return;
+            }
+        }
+        Renderer& renderer = Renderer::GetInstance();
+        Rect cursorPos = { 0.0f, 0.0f, 10 * renderer.GetPixelWidth(), charHeight_*renderer.GetPixelHeight() };
+        GetPosition(cursorX_, cursorY_, &cursorPos.left, &cursorPos.top);
+        renderer.SetTexture(Renderer::TEX_FONT);
+        renderer.RenderRect(cursorPos, cursorUVs_);
+    }
+
     void TextInput::Render()
     {
         Renderer& renderer = Renderer::GetInstance();
@@ -51,10 +67,7 @@ namespace OGUI {
             renderer.RenderText(text_[i].c_str(), pos_.left, pos_.top + i * charHeight_ * renderer.GetPixelHeight());
         }
         if (keyFocus_) {
-            Rect cursorPos = { 0.0f, 0.0f, 10 * renderer.GetPixelWidth(), charHeight_*renderer.GetPixelHeight() };
-            GetPosition(cursorX_, cursorY_, &cursorPos.left, &cursorPos.top);
-            renderer.SetTexture(Renderer::TEX_FONT);
-            renderer.RenderRect(cursorPos, cursorUVs_);
+            RenderCursor();
             if (HasSelection()) {
                 int x1 = selectStartX_;
                 int x2 = selectEndX_;
@@ -201,6 +214,9 @@ namespace OGUI {
 
         selectEndX_ = selectStartX_;
         selectEndY_ = selectStartY_;
+        if (startY == endY) {
+            startX = min(selectStartX_, selectEndX_);
+        }
         MoveCursor(startX, selectStartY_, false);
     }
 
@@ -303,7 +319,7 @@ namespace OGUI {
     void TextInput::GetPosition(int x, int y, float* fx, float* fy)
     {
         Renderer& renderer = Renderer::GetInstance();
-        *fx = pos_.left + x * charWidth_ * renderer.GetPixelWidth();
+        *fx = pos_.left + (x - 0.5f) * charWidth_ * renderer.GetPixelWidth();
         *fy = pos_.top + y * charHeight_ * renderer.GetPixelHeight();
     }
 
