@@ -40,6 +40,5 @@ namespace OGUI
         int charHeight_;
         bool multiline_;
         bool cursorBlink_;
-        
     };
 }
