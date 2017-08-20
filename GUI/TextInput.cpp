@@ -93,7 +93,7 @@ namespace OGUI {
             {
             case SDLK_BACKSPACE:
                 if (!HasSelection()) {
-					MoveCursor(cursorX_ - 1, cursorY_, false);
+                    MoveCursor(cursorX_ - 1, cursorY_, false);
                     MoveCursor(cursorX_ + 1, cursorY_, true);
                 }
                 Erase();
