@@ -11,7 +11,7 @@ namespace OGraphics
         ~Shader();
 
         void Load(const wchar_t* vert, const wchar_t* frag);
-        const GLuint GetProgramId() const;
+        const GLuint GetProgramID() const;
     private:
         GLuint programId_;
     };

@@ -102,7 +102,7 @@ namespace OGraphics
         programId_ = ProgramID;
     }
 
-    const GLuint Shader::GetProgramId() const
+    const GLuint Shader::GetProgramID() const
     {
         return programId_;
     }
@@ -259,7 +259,7 @@ namespace OGraphics
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer_);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * numIndexes_, indexes_, GL_STATIC_DRAW);
 
-        GLuint programID = shader_->GetProgramId();
+        GLuint programID = shader_->GetProgramID();
         GLuint textureID = texture_->GetTextureID();
         GLuint matrixLocation = glGetUniformLocation(programID, "MVP");
         GLuint textureLocation = glGetUniformLocation(programID, "sampler");

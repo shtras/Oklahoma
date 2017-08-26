@@ -16,7 +16,7 @@ namespace OGUI {
         multiline_(false),
         cursorBlink_(true)
     {
-        Init({ 168, 172, 184, 187, 2, 4, 16, 19 });
+        Init({ 168, 172, 184, 187, 2, 5, 16, 19 });
         clickable_ = true;
         keyboardListener_ = true;
         for (wchar_t c = L'a'; c <= L'z'; ++c) {
