@@ -68,7 +68,7 @@ namespace OGUI
         Renderer& renderer = Renderer::GetInstance();
         int width = renderer.GetWidth();
         int height = renderer.GetHeight();
-        auto tex = renderer.GetTexture(Renderer::TEX_GUI);
+        auto tex = renderer.GetTexture(Renderer::TextureType::GUI);
         float fl1 = texPos.l1 / (float)tex->GetWidth();
         float fl2 = texPos.l2 / (float)tex->GetWidth();
         float fl3 = texPos.l3 / (float)tex->GetWidth();
@@ -133,7 +133,7 @@ namespace OGUI
             if (pressed_ && (texState_ & PRESSED)) {
                 uvs = pressedUVs_;
             }
-            renderer.SetTexture(Renderer::TEX_GUI);
+            renderer.SetTexture(Renderer::TextureType::GUI);
             for (int i = 0; i < 9; ++i) {
                 renderer.RenderRect(rects_[i], uvs[i]);
             }
@@ -215,44 +215,46 @@ namespace OGUI
         }
     }
 
+    Widget::ResizeDirection Widget::GetResizeDirection(float x, float y) const
+    {
+        float border = 0.1f;
+        if (x >= pos_.left + pos_.width * (1.0f - border) && y >= pos_.top + pos_.height * (1.0f - border)) {
+            return ResizeDirection::BottomRight;
+        }
+        if (x <= pos_.left + pos_.width * border && y >= pos_.top + pos_.height * (1.0f - border)) {
+            return ResizeDirection::BottomLeft;
+        }
+        if (x >= pos_.left + pos_.width * (1.0f - border) && y <= pos_.top + pos_.height * border) {
+            return ResizeDirection::TopRight;
+        }
+        if (x <= pos_.left + pos_.width * border && y <= pos_.top + pos_.height * border) {
+            return ResizeDirection::TopLeft;
+        }
+        if (x >= pos_.left + pos_.width * (1.0f - border)) {
+            return ResizeDirection::Right;
+        }
+        if (x <= pos_.left + pos_.width * border) {
+            return ResizeDirection::Left;
+        }
+        if (y >= pos_.top + pos_.height * (1.0f - border)) {
+            return ResizeDirection::Bottom;
+        }
+        if (y <= pos_.top + pos_.height * border) {
+            return ResizeDirection::Top;
+        }
+        return ResizeDirection::None;
+    }
+
     void Widget::HandleMouseDown(float x, float y)
     {
         auto& mainWindow = MainWindow::GetInstance();
         if (draggable_ && parent_) {
             parent_->MoveToTop(this);
         }
-        float border = 0.1f;
         if (resizable_) {
-            if (x >= pos_.left + pos_.width * (1.0f - border) && y >= pos_.top + pos_.height * (1.0f - border)) {
-                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::BottomRight);
-                return;
-            }
-            if (x <= pos_.left + pos_.width * border && y >= pos_.top + pos_.height * (1.0f - border)) {
-                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::BottomLeft);
-                return;
-            }
-            if (x >= pos_.left + pos_.width * (1.0f - border) && y <= pos_.top + pos_.height * border) {
-                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::TopRight);
-                return;
-            }
-            if (x <= pos_.left + pos_.width * border && y <= pos_.top + pos_.height * border) {
-                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::TopLeft);
-                return;
-            }
-            if (x >= pos_.left + pos_.width * (1.0f - border)) {
-                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::Right);
-                return;
-            }
-            if (x <= pos_.left + pos_.width * border) {
-                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::Left);
-                return;
-            }
-            if (y >= pos_.top + pos_.height * (1.0f - border)) {
-                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::Bottom);
-                return;
-            }
-            if (y <= pos_.top + pos_.height * border) {
-                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::Top);
+            auto resizeDir = GetResizeDirection(x, y);
+            if (resizeDir != ResizeDirection::None) {
+                mainWindow.RegisterResized(this, resizeDir);
                 return;
             }
         }
@@ -358,6 +360,36 @@ namespace OGUI
         }
 
         MainWindow::GetInstance().RegisterHovered(this);
+
+        auto& renderer = Renderer::GetInstance();
+        if (resizable_) {
+            ResizeDirection resizeDir = GetResizeDirection(x, y);
+            switch (resizeDir)
+            {
+            case OGUI::Widget::ResizeDirection::TopLeft:
+            case OGUI::Widget::ResizeDirection::BottomRight:
+                renderer.SetMouseCursor(Renderer::MouseCursor::ResizeDiagonalNW);
+                break;
+            case OGUI::Widget::ResizeDirection::Top:
+            case OGUI::Widget::ResizeDirection::Bottom:
+                renderer.SetMouseCursor(Renderer::MouseCursor::ResizeVertical);
+                break;
+            case OGUI::Widget::ResizeDirection::TopRight:
+            case OGUI::Widget::ResizeDirection::BottomLeft:
+                renderer.SetMouseCursor(Renderer::MouseCursor::ResizeDiagonalNE);
+                break;
+            case OGUI::Widget::ResizeDirection::Right:
+            case OGUI::Widget::ResizeDirection::Left:
+                renderer.SetMouseCursor(Renderer::MouseCursor::ResizeHorizontal);
+                break;
+            default:
+                renderer.SetMouseCursor(Renderer::MouseCursor::Default);
+                break;
+            }
+        } else {
+            renderer.SetMouseCursor(Renderer::MouseCursor::Default);
+        }
+
         HandleMouseEventSelf(event, x, y);
         return true;
     }
@@ -371,5 +403,4 @@ namespace OGUI
     {
 
     }
-
 }

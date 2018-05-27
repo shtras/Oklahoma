@@ -167,14 +167,16 @@ namespace OGraphics
         height_(720),
         dbgFlushes_(0),
         dbgVertices_(0),
-        dbgRects_(0)
+        dbgRects_(0),
+        mouseCursor_(MouseCursor::Default),
+        mousePos_{0, 0, 0, 0}
     {
 
     }
 
     Renderer::~Renderer()
     {
-        Destroy();
+        destroy();
     }
 
     Renderer& Renderer::GetInstance()
@@ -190,8 +192,9 @@ namespace OGraphics
 
     void Renderer::RenderFrame()
     {
+        renderMouseCursor();
         if (numVertices_ > 0) {
-            FLush();
+            fLush();
         }
 
         //wcout << L"F: " << dbgFlushes_ << L" V: " << dbgVertices_ << L" R: " << dbgRects_ << endl;
@@ -201,7 +204,7 @@ namespace OGraphics
 
         SDL_GL_SwapWindow(mainWindow_);
         GLERR;
-        Clear();
+        clear();
     }
 
     void Renderer::Init()
@@ -219,20 +222,22 @@ namespace OGraphics
 
         glViewport(0, 0, width_, height_);
         
-        //glm::mat4 Projection = glm::perspective(glm::radians(-45.0f), (float)width_ / (float)height_, 0.1f, 100.0f);
         glm::mat4 Projection = glm::ortho(0.0f, 1.0f, 1.0f, 0.0f, -5.0f, 5.0f);
         glm::mat4 View = glm::lookAt(glm::vec3(0, 0, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
         glm::mat4 Model = glm::mat4(1.0f);
-        mvp_ = Projection;// *View * Model;
-        LoadShader(L"Shaders\\vert.glsl", L"Shaders\\frag.glsl", SHADER_DEFAULT);
-        SetShader(SHADER_DEFAULT);
+        mvp_ = Projection;
+        loadShader(L"Shaders\\vert.glsl", L"Shaders\\frag.glsl", ShaderType::Default);
+        SetShader(ShaderType::Default);
 
-        LoadTexture("Textures\\gui0.png", TEX_GUI);
-        LoadTexture("Textures\\Font.png", TEX_FONT);
-        LoadTexture("Textures\\test.png", TEX_TEST);
-        InitTextUVs();
+        loadTexture("Textures\\gui0.png", TextureType::GUI);
+        loadTexture("Textures\\Font.png", TextureType::Font);
+        loadTexture("Textures\\test.png", TextureType::Test);
+        initTextUVs();
+        initMouseCursorUVs();
 
         SetCharSize(15, 20);
+        mousePos_.width = 32.0f / (float)width_;
+        mousePos_.height = 32.0f / (float)height_;
 
         glGenBuffers(1, &vertexBuffer_);
         glGenBuffers(1, &uvBuffer_);
@@ -245,9 +250,10 @@ namespace OGraphics
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glActiveTexture(GL_TEXTURE0);
         boundRectQueue_.push_back({ -1.0f, -1.0f, 2.0f, 2.0f });
+        SDL_ShowCursor(0);
     }
 
-    void Renderer::FLush()
+    void Renderer::fLush()
     {
         if (numIndexes_ == 0) {
             return;
@@ -296,15 +302,15 @@ namespace OGraphics
     void Renderer::RenderRect(const Rect& pos, const Rect& tex)
     {
         if (numIndexes_ >= POINTS_NUM - 6) {
-            FLush();
+            fLush();
         }
         
-        AddVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
-        AddVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
-        AddVertex({ pos.left + pos.width, pos.top, 0 }, { tex.left + tex.width, tex.top });
-        AddVertex(-3);
-        AddVertex({ pos.left, pos.top + pos.height, 0 }, { tex.left, tex.top + tex.height });
-        AddVertex(-3);
+        addVertex({ pos.left, pos.top, 0 }, { tex.left, tex.top });
+        addVertex({ pos.left + pos.width, pos.top + pos.height, 0 }, { tex.left + tex.width, tex.top + tex.height });
+        addVertex({ pos.left + pos.width, pos.top, 0 }, { tex.left + tex.width, tex.top });
+        addVertex(-3);
+        addVertex({ pos.left, pos.top + pos.height, 0 }, { tex.left, tex.top + tex.height });
+        addVertex(-3);
         ++dbgRects_;
     }
 
@@ -313,7 +319,7 @@ namespace OGraphics
         RenderRect(pos, tex);
     }
 
-    void Renderer::AddVertex(const Vertex& v, const UV& uv)
+    void Renderer::addVertex(const Vertex& v, const UV& uv)
     {
         if (!texture_) {
             LogError(L"No active texture");
@@ -325,14 +331,14 @@ namespace OGraphics
         ++dbgVertices_;
     }
 
-    void Renderer::AddVertex(int didx)
+    void Renderer::addVertex(int didx)
     {
         indexes_[numIndexes_++] = numVertices_ + didx;
     }
 
     void Renderer::RenderText(const wchar_t* text, float x, float y)
     {
-        SetTexture(TEX_FONT);
+        SetTexture(TextureType::Font);
         size_t len = wcslen(text);
         for (int i = 0; i < len; ++i) {
             wchar_t c = text[i];
@@ -349,7 +355,7 @@ namespace OGraphics
         if (texture_ == textures_[tex]) {
             return;
         }
-        FLush();
+        fLush();
         texture_ = textures_[tex];
     }
 
@@ -358,7 +364,7 @@ namespace OGraphics
         if (shader_ == shaders_[shader]) {
             return;
         }
-        FLush();
+        fLush();
         shader_ = shaders_[shader];
     }
 
@@ -368,6 +374,17 @@ namespace OGraphics
         charHeightLast_ = charHeight_;
         charWidth_ = width / (float)width_;
         charHeight_ = height / (float)height_;
+    }
+
+    void Renderer::SetMouseCursor(MouseCursor cursor)
+    {
+        mouseCursor_ = cursor;
+    }
+
+    void Renderer::SetMouseCoords(float x, float y)
+    {
+        mousePos_.left = x - mousePos_.width * 0.5f;
+        mousePos_.top = y - mousePos_.height * 0.5f;
     }
 
     void Renderer::ResetCharSize()
@@ -399,7 +416,7 @@ namespace OGraphics
     void Renderer::PushBound(const Rect& r)
     {
         if (r != boundRectQueue_.back()) {
-            FLush();
+            fLush();
         }
         Rect& newR = boundRectQueue_.back().Intersect(r);
         boundRectQueue_.push_back(newR);
@@ -408,7 +425,7 @@ namespace OGraphics
     void Renderer::PopBound()
     {
         Rect r = boundRectQueue_.back();
-        FLush();
+        fLush();
         boundRectQueue_.pop_back();
     }
 
@@ -431,7 +448,7 @@ namespace OGraphics
         return 1 / (float)height_;
     }
 
-    void Renderer::Destroy()
+    void Renderer::destroy()
     {
         glDeleteBuffers(1, &vertexBuffer_);
         glDeleteBuffers(1, &uvBuffer_);
@@ -440,32 +457,32 @@ namespace OGraphics
         SDL_DestroyWindow(mainWindow_);
     }
 
-    void Renderer::Clear()
+    void Renderer::clear()
     {
         numVertices_ = 0;
         numIndexes_ = 0;
     }
 
-    void Renderer::LoadTexture(const char* path, TextureType type)
+    void Renderer::loadTexture(const char* path, TextureType type)
     {
         auto texture = std::make_shared<Texture>();
         texture->Load(path);
         textures_[type] = texture;
     }
 
-    void Renderer::LoadShader(const wchar_t* vert, const wchar_t* frag, ShaderType type)
+    void Renderer::loadShader(const wchar_t* vert, const wchar_t* frag, ShaderType type)
     {
         auto shader = std::make_shared<Shader>();
         shader->Load(vert, frag);
         shaders_[type] = shader;
     }
 
-    void Renderer::InitTextUVs()
+    void Renderer::initTextUVs()
     {
         int charWidth = 19;
         int charHeight = 41;
-        int texWidth = textures_[TEX_FONT]->GetWidth();
-        int texHeight = textures_[TEX_FONT]->GetHeight();
+        int texWidth = textures_[TextureType::Font]->GetWidth();
+        int texHeight = textures_[TextureType::Font]->GetHeight();
         float fCharWidth = charWidth / (float)texWidth;
         float fCharHeight = charHeight / (float)texHeight;
         std::wifstream f(L"Textures\\font.txt", std::ios::in);
@@ -486,4 +503,29 @@ namespace OGraphics
             }
         }
     }
+
+    void Renderer::initMouseCursorUVs()
+    {
+        cursorUVs_[MouseCursor::Default] = Rect{ 234,2,34,34 };
+        cursorUVs_[MouseCursor::ResizeHorizontal] = Rect{ 266,2,32,32 };
+        cursorUVs_[MouseCursor::ResizeVertical] = Rect{ 295,2,32,32 };
+        cursorUVs_[MouseCursor::ResizeDiagonalNE] = Rect{ 294,30,32,32 };
+        cursorUVs_[MouseCursor::ResizeDiagonalNW] = Rect{ 264,27,32,32 };
+
+        float texWidth = (float)textures_[TextureType::GUI]->GetWidth();
+        float texHeight = (float)textures_[TextureType::GUI]->GetHeight();
+        for (auto& itr : cursorUVs_) {
+            itr.second.left /= texWidth;
+            itr.second.top /= texHeight;
+            itr.second.width /= texWidth;
+            itr.second.height /= texHeight;
+        }
+    }
+
+    void Renderer::renderMouseCursor()
+    {
+        SetTexture(TextureType::GUI);
+        RenderRect(mousePos_, cursorUVs_[mouseCursor_]);
+    }
+
 }

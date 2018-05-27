@@ -29,8 +29,8 @@ namespace OGUI {
             shiftChars_[str1[i]] = str2[i];
         }
         cursorUVs_ = { 5, 176, 12, 22 };
-        Renderer::GetInstance().InitUVs(cursorUVs_, Renderer::TEX_FONT);
-        Renderer::GetInstance().InitUVs(selectionUVs_, Renderer::TEX_FONT);
+        Renderer::GetInstance().InitUVs(cursorUVs_, Renderer::TextureType::Font);
+        Renderer::GetInstance().InitUVs(selectionUVs_, Renderer::TextureType::Font);
         std::wstring strWordChars = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
         for (auto c: strWordChars) {
             wordChars_.insert(c);
@@ -54,7 +54,7 @@ namespace OGUI {
         Renderer& renderer = Renderer::GetInstance();
         Rect cursorPos = { 0.0f, 0.0f, 10 * renderer.GetPixelWidth(), charHeight_*renderer.GetPixelHeight() };
         GetPosition(cursorX_, cursorY_, &cursorPos.left, &cursorPos.top);
-        renderer.SetTexture(Renderer::TEX_FONT);
+        renderer.SetTexture(Renderer::TextureType::Font);
         renderer.RenderRect(cursorPos, cursorUVs_);
     }
 

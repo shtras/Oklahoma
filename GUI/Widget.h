@@ -15,6 +15,7 @@ namespace OGUI
             PRESSED=4
         };
     public:
+        enum class ResizeDirection { None, TopLeft, Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left };
         friend class Window;
         Widget(Rect pos);
         virtual ~Widget();
@@ -35,6 +36,7 @@ namespace OGUI
         void SetDraggable(bool value);
         void SetVisible(bool value);
         virtual void OnChildMove(Widget* w);
+        ResizeDirection GetResizeDirection(float x, float y) const;
     protected:
         Widget() = delete;
         Widget(const Widget& other) = delete;

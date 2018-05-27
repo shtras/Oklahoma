@@ -6,7 +6,6 @@ namespace OGUI
     class MainWindow : public Widget
     {
     public:
-        enum class ResizeDirection {None, TopLeft, Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left};
         static MainWindow& GetInstance();
         void RegisterHovered(Widget* w);
         void RegisterPressed(Widget* w);

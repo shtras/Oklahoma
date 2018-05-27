@@ -128,7 +128,7 @@ namespace OGUI
         visible_ = false;
         clickable_ = true;
         Renderer& renderer = Renderer::GetInstance();
-        renderer.InitUVs(positionUVs_, Renderer::TEX_GUI);
+        renderer.InitUVs(positionUVs_, Renderer::TextureType::GUI);
         Init({ 183, 186, 197, 199, 40, 40, 46, 46 });
         switch (type)
         {
@@ -180,7 +180,7 @@ namespace OGUI
         }
 
         Widget::Render();
-        Renderer::GetInstance().SetTexture(Renderer::TEX_GUI);
+        Renderer::GetInstance().SetTexture(Renderer::TextureType::GUI);
         Renderer::GetInstance().RenderRect({pos_.left, pos_.top + pos_.height*(0.1f + y_), pos_.width, pos_.height * (height_ - 0.2f)}, positionUVs_);
     }
 
