@@ -58,9 +58,8 @@ namespace OGraphics
         // Check Vertex Shader
         glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
         glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        ++InfoLogLength;
         if (InfoLogLength > 0) {
-            std::vector<char> VertexShaderErrorMessage(InfoLogLength);
+            std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
             glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
             LogError(L"Error in vertex shader: %hs", &VertexShaderErrorMessage[0]);
         }
@@ -73,9 +72,8 @@ namespace OGraphics
         // Check Fragment Shader
         glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
         glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        ++InfoLogLength;
         if (InfoLogLength > 0) {
-            std::vector<char> FragmentShaderErrorMessage(InfoLogLength);
+            std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
             glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
             LogError(L" Error in fragment shader: %hs", &FragmentShaderErrorMessage[0]);
         }
@@ -89,9 +87,8 @@ namespace OGraphics
         // Check the program
         glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
         glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        ++InfoLogLength;
         if (InfoLogLength > 0) {
-            std::vector<char> ProgramErrorMessage(InfoLogLength);
+            std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
             glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
             LogError(L"Error in shader link: %hs", &ProgramErrorMessage[0]);
         }
