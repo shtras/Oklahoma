@@ -1,5 +1,6 @@
 #pragma once
 #include "Renderer.h"
+#include "MainWindow.h"
 
 class Oklahoma
 {
@@ -16,4 +17,5 @@ public:
 private:
 
     bool running_;
+    std::unique_ptr<OGUI::MainWindow> mainWindow_ = nullptr;
 };

@@ -4,8 +4,8 @@
 namespace OGUI
 {
 
-    Image::Image(Rect pos, Rect uvs, Renderer::TextureType type):
-        Widget(pos),
+    Image::Image(Rect pos, MainWindow* mw, Rect uvs, Renderer::TextureType type):
+        Widget(pos, mw),
         uvs_(uvs)
     {
         Renderer::GetInstance().InitUVs(uvs, type);

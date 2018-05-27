@@ -7,7 +7,7 @@ namespace OGUI
     class Button : public Widget
     {
     public:
-        Button(Rect pos);
+        Button(Rect pos, MainWindow* mw);
         ~Button();
         void SetText(std::wstring& str);
         void SetText(const wchar_t* str);
@@ -15,6 +15,6 @@ namespace OGUI
         void Bind();
         std::function<void(void)> F;
     protected:
-        std::shared_ptr<Label> label_;
+        std::shared_ptr<Label> label_ = nullptr;
     };
 }

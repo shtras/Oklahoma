@@ -2,8 +2,8 @@
 #include "TextInput.h"
 
 namespace OGUI {
-    TextInput::TextInput(Rect pos):
-        Widget(pos),
+    TextInput::TextInput(Rect pos, MainWindow* mw):
+        Widget(pos, mw),
         cursorX_(0),
         cursorY_(0),
         selectStartX_(0),

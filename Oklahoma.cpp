@@ -1,12 +1,11 @@
 #include "StdAfx.h"
 #include "Oklahoma.h"
 #include "Version.h"
-#include "Widget.h"
-#include "MainWindow.h"
 #include "Window.h"
 #include "Label.h"
 #include "Button.h"
 #include "TextInput.h"
+#include "mainWindow.h"
 
 using namespace OGraphics;
 using namespace OGUI;
@@ -41,19 +40,18 @@ int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance
 
 void Oklahoma::PerfTest()
 {
-    auto& mainWindow = MainWindow::GetInstance();
     for (int i = 0; i < 20; ++i) {
         for (int j = 0; j < 20; ++j) {
-            auto w = std::make_shared<Window>(Rect({ i*0.05f, j*0.05f, 0.05f, 0.05f }));
-            mainWindow.AddWidget(w);
+            auto w = mainWindow_->CreateWidget<Window>(Rect({ i*0.05f, j*0.05f, 0.05f, 0.05f }));
+            mainWindow_->AddWidget(w);
             std::shared_ptr<Window> wItr = w;
             std::shared_ptr<Window> wItrNext = nullptr;
             for (int k = 0; k < 5; ++k) {
-                wItrNext = std::make_shared<Window>(Rect({ 0.1f, 0.1f, 0.8f, 0.8f }));
+                wItrNext = mainWindow_->CreateWidget<Window>(Rect({ 0.1f, 0.1f, 0.8f, 0.8f }));
                 wItr->AddWidget(wItrNext);
                 wItr = wItrNext;
             }
-            auto b = std::make_shared<Button>(Rect({ 0.1f, 0.9f, 0.8f, 0.1f }));
+            auto b = mainWindow_->CreateWidget<Button>(Rect({ 0.1f, 0.9f, 0.8f, 0.1f }));
             b->SetText(L"Hello!");
             wItr->AddWidget(b);
         }
@@ -62,24 +60,23 @@ void Oklahoma::PerfTest()
 
 void Oklahoma::RegularTest()
 {
-    auto& mainWindow = MainWindow::GetInstance();
-    //     auto w00 = std::make_shared<Window>(Rect({ 0.0f, 0.0f, 1.0f, 1.0f }));
-    //     mainWindow.AddWidget(w00);
+    //     auto w00 = mainWindow_->CreateWidget<Window>(Rect({ 0.0f, 0.0f, 1.0f, 1.0f }));
+    //     mainWindow_->AddWidget(w00);
 
-    auto w = std::make_shared<Window>(Rect({ 0.1f, 0.1f, 0.8f, 0.8f }));
+    auto w = mainWindow_->CreateWidget<Window>(Rect({ 0.1f, 0.1f, 0.8f, 0.8f }));
     //     w->ToggleScrollBar(ScrollBar::VERTICAL, true);
-    //     auto btn = std::make_shared<Button>(Rect({ 0.4f, 0.8f, 0.2f, 0.1f }));
+    //     auto btn = mainWindow_->CreateWidget<Button>(Rect({ 0.4f, 0.8f, 0.2f, 0.1f }));
     //     btn->F = std::bind(&Oklahoma::Quit, this);
     //     btn->SetText(L"OK!");
     //     w->AddWidget(btn);
 
-    auto w0 = std::make_shared<Window>(Rect({ 0.1f, 0.3f, 0.5f, 0.4f }));
+    auto w0 = mainWindow_->CreateWidget<Window>(Rect({ 0.1f, 0.3f, 0.5f, 0.4f }));
     w->AddWidget(w0);
 
-    auto w1 = std::make_shared<Window>(Rect({ 0.6f, 0.3f, 0.2f, 0.4f }));
+    auto w1 = mainWindow_->CreateWidget<Window>(Rect({ 0.6f, 0.3f, 0.2f, 0.4f }));
     //    w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
     //     for (int i = 0; i < 15; ++i) {
-    //         auto l = std::make_shared<Label>(Rect({ 0.1f, i * 0.15f, 0.8f, 0.15f }));
+    //         auto l = mainWindow_->CreateWidget<Label>(Rect({ 0.1f, i * 0.15f, 0.8f, 0.15f }));
     //         wchar_t txt[128];
     //         swprintf_s(txt, L"Labeliko # %d", i);
     //         l->SetText(txt);
@@ -87,14 +84,14 @@ void Oklahoma::RegularTest()
     //     }
     w->AddWidget(w1);
 
-    //     auto inp = std::make_shared<TextInput>(Rect({0.1f, 0.1f, 0.8f, 0.5f}));
+    //     auto inp = mainWindow_->CreateWidget<TextInput>(Rect({0.1f, 0.1f, 0.8f, 0.5f}));
     //     inp->SetMultiline(true);
     //     w->AddWidget(inp);
 
-    auto inp1 = std::make_shared<TextInput>(Rect({ 0.1f, 0.7f, 0.8f, 0.1f }));
+    auto inp1 = mainWindow_->CreateWidget<TextInput>(Rect({ 0.1f, 0.7f, 0.8f, 0.1f }));
     w->AddWidget(inp1);
 
-    mainWindow.AddWidget(w);
+    mainWindow_->AddWidget(w);
 }
 
 void Oklahoma::Run()
@@ -104,12 +101,11 @@ void Oklahoma::Run()
     int frames = 0;
     wchar_t fpsStr[128];
     auto& renderer = Renderer::GetInstance();
-    auto& mainWindow = MainWindow::GetInstance();
     
     RegularTest();
     //PerfTest();
-    auto fpsText = std::make_shared<Label>(Rect({ 0.0f, 0.9f, 0.1f, 0.1f }));
-    mainWindow.AddWidget(fpsText);
+    auto fpsText = mainWindow_->CreateWidget<Label>(Rect({ 0.0f, 0.9f, 0.1f, 0.1f }));
+    mainWindow_->AddWidget(fpsText);
     while (running_) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -125,12 +121,12 @@ void Oklahoma::Run()
             {
                 float x = event.motion.x / (float)renderer.GetWidth();
                 float y = event.motion.y / (float)renderer.GetHeight();
-                mainWindow.HandleMouseEvent(event, x, y);
+                mainWindow_->HandleMouseEvent(event, x, y);
                 break;
             }
             case SDL_KEYDOWN:
             case SDL_KEYUP:
-                mainWindow.HandleKeyboardEvent(event);
+                mainWindow_->HandleKeyboardEvent(event);
                 break;
             }
         }
@@ -148,7 +144,7 @@ void Oklahoma::Run()
 
         renderer.StartFrame();
         
-        mainWindow.Render();
+        mainWindow_->Render();
         renderer.RenderFrame();
     }
 }
@@ -158,6 +154,8 @@ void Oklahoma::Init()
     Renderer& renderer = Renderer::GetInstance();
     renderer.Init();
     renderer.SetCharSize(20, 40);
+
+    mainWindow_ = std::make_unique<MainWindow>();
 }
 
 void Oklahoma::Quit()

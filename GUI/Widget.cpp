@@ -1,11 +1,11 @@
 #include "StdAfx.h"
 #include "Widget.h"
-#include "MainWindow.h"
+#include "mainWindow.h"
 
 namespace OGUI
 {
     static int NumWidgets = 0;
-    Widget::Widget(Rect pos) :
+    Widget::Widget(OGraphics::Rect pos, OGUI::MainWindow* mw) :
         pos_(pos),
         relativePos_(pos),
         hovered_(false),
@@ -22,7 +22,8 @@ namespace OGUI
         dragStartX_(0),
         dragStartY_(0),
         keyboardListener_(false),
-        parent_(nullptr)
+        parent_(nullptr),
+        mainWindow_(mw)
     {
         ++NumWidgets;
     }
@@ -247,37 +248,35 @@ namespace OGUI
 
     void Widget::HandleMouseDown(float x, float y)
     {
-        auto& mainWindow = MainWindow::GetInstance();
         if (draggable_ && parent_) {
             parent_->MoveToTop(this);
         }
         if (resizable_) {
             auto resizeDir = GetResizeDirection(x, y);
             if (resizeDir != ResizeDirection::None) {
-                mainWindow.RegisterResized(this, resizeDir);
+                mainWindow_->RegisterResized(this, resizeDir);
                 return;
             }
         }
         if (draggable_) {
-            mainWindow.RegisterDragged(this);
+            mainWindow_->RegisterDragged(this);
         } else if (clickable_) {
-            mainWindow.RegisterPressed(this);
+            mainWindow_->RegisterPressed(this);
         }
     }
 
     void Widget::HandleMouseUp(float x, float y)
     {
-        auto& mainWindow = MainWindow::GetInstance();
-        mainWindow.RegisterDragged(nullptr);
-        mainWindow.RegisterPressed(nullptr);
-        mainWindow.RegisterResized(nullptr, MainWindow::ResizeDirection::None);
+        mainWindow_->RegisterDragged(nullptr);
+        mainWindow_->RegisterPressed(nullptr);
+        mainWindow_->RegisterResized(nullptr, MainWindow::ResizeDirection::None);
         if (clickable_) {
             OnClick();
         }
         if (keyboardListener_) {
-            mainWindow.RegisterKeyboardListener(this);
+            mainWindow_->RegisterKeyboardListener(this);
         } else {
-            mainWindow.RegisterKeyboardListener(nullptr);
+            mainWindow_->RegisterKeyboardListener(nullptr);
         }
     }
 
@@ -346,10 +345,10 @@ namespace OGUI
         }
         if (!IsWithin(x, y)) {
             if (hovered_) {
-                MainWindow::GetInstance().RegisterHovered(nullptr);
+                mainWindow_->RegisterHovered(nullptr);
             }
             if (pressed_) {
-                MainWindow::GetInstance().RegisterPressed(nullptr);
+                mainWindow_->RegisterPressed(nullptr);
             }
             return false;
         }
@@ -359,7 +358,7 @@ namespace OGUI
             }
         }
 
-        MainWindow::GetInstance().RegisterHovered(this);
+        mainWindow_->RegisterHovered(this);
 
         auto& renderer = Renderer::GetInstance();
         if (resizable_) {

@@ -5,7 +5,7 @@
 namespace OGUI
 {
     MainWindow::MainWindow() noexcept :
-        Widget({ 0.0f, 0.0f, 1.0f, 1.0f }),
+        Widget({ 0.0f, 0.0f, 1.0f, 1.0f }, this),
         hoveredWidget_(nullptr),
         pressedWidget_(nullptr),
         draggedWidget_(nullptr),
@@ -156,11 +156,5 @@ namespace OGUI
         if (keyboardListenerWidget_) {
             keyboardListenerWidget_->HandleKeyboardEvent(event);
         }
-    }
-
-    MainWindow& MainWindow::GetInstance()
-    {
-        static MainWindow instance;
-        return instance;
     }
 }

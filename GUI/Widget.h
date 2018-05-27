@@ -5,6 +5,8 @@ using namespace OGraphics;
 
 namespace OGUI
 {
+    class MainWindow;
+
     class Widget
     {
         enum TextureState
@@ -17,7 +19,6 @@ namespace OGUI
     public:
         enum class ResizeDirection { None, TopLeft, Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left };
         friend class Window;
-        Widget(Rect pos);
         virtual ~Widget();
         virtual void Render();
         virtual void AddWidget(std::shared_ptr<Widget> widget);
@@ -38,6 +39,7 @@ namespace OGUI
         virtual void OnChildMove(Widget* w);
         ResizeDirection GetResizeDirection(float x, float y) const;
     protected:
+        Widget(OGraphics::Rect pos, OGUI::MainWindow* mw);
         Widget() = delete;
         Widget(const Widget& other) = delete;
         void CreateUVs(OGraphics::Rect* uvs, TexturePos& texPos);
@@ -76,5 +78,6 @@ namespace OGUI
         float dragStartX_;
         float dragStartY_;
         Widget* parent_;
+        MainWindow* mainWindow_;
     };
 }

@@ -6,7 +6,7 @@ namespace OGUI
     class Label : public Widget
     {
     public:
-        Label(Rect pos);
+        Label(Rect pos, MainWindow* mw);
         ~Label();
         void SetText(std::wstring& str);
         void SetText(const wchar_t* str);

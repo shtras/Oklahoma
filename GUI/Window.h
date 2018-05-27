@@ -11,7 +11,7 @@ namespace OGUI
     {
     public:
         enum ScrollBarType { VERTICAL = 0, HORIZONTAL = 1, MAX_TYPE };
-        ScrollBar(Window* wnd, Rect pos, ScrollBarType type);
+        ScrollBar(Window* wnd, Rect pos, ScrollBarType type, MainWindow* mw);
         ~ScrollBar();
         void SetPosition(float y, float height);
         void Render() override;
@@ -30,7 +30,7 @@ namespace OGUI
     class Window : public Widget
     {
     public:
-        Window(Rect pos);
+        Window(Rect pos, MainWindow* mw);
         ~Window();
         void Render() override;
         void ToggleScrollBar(ScrollBar::ScrollBarType type, bool val);

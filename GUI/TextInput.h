@@ -6,7 +6,7 @@ namespace OGUI
     class TextInput : public Widget
     {
     public:
-        TextInput(Rect pos);
+        TextInput(Rect pos, MainWindow* mw);
         ~TextInput();
         void Render() override;
         void HandleKeyboardEvent(SDL_Event& event);

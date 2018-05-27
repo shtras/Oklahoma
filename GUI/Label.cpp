@@ -3,8 +3,8 @@
 
 namespace OGUI {
 
-    Label::Label(Rect pos):
-        Widget(pos)
+    Label::Label(Rect pos, MainWindow* mw):
+        Widget(pos, mw)
     {
         interactive_ = false;
     }

@@ -6,7 +6,15 @@ namespace OGUI
     class MainWindow : public Widget
     {
     public:
-        static MainWindow& GetInstance();
+        MainWindow() noexcept;
+        ~MainWindow();
+        
+        template <class T, class... _Types>
+        std::shared_ptr<T> CreateWidget(_Types&&... _Args) {
+            auto res = std::make_shared<T>(_STD forward<_Types>(_Args)..., this);
+            return res;
+        }
+
         void RegisterHovered(Widget* w);
         void RegisterPressed(Widget* w);
         void RegisterDragged(Widget* w);
@@ -15,8 +23,6 @@ namespace OGUI
         bool HandleMouseEvent(SDL_Event& event, float x, float y) override;
         void HandleKeyboardEvent(SDL_Event& event) override;
     private:
-        MainWindow() noexcept;
-        ~MainWindow();
         Widget* hoveredWidget_;
         Widget* pressedWidget_;
         Widget* draggedWidget_;
