@@ -223,7 +223,7 @@ namespace OGUI
         }
         float border = 0.1f;
         if (resizable_) {
-            if (x >= pos_.left + (pos_.width * 1.0f - border) && y >= pos_.top + pos_.height * (1.0f - border)) {
+            if (x >= pos_.left + pos_.width * (1.0f - border) && y >= pos_.top + pos_.height * (1.0f - border)) {
                 mainWindow.RegisterResized(this, MainWindow::ResizeDirection::BottomRight);
                 return;
             }
@@ -231,7 +231,7 @@ namespace OGUI
                 mainWindow.RegisterResized(this, MainWindow::ResizeDirection::BottomLeft);
                 return;
             }
-            if (x >= pos_.left + (pos_.width * 1.0f - border) && y <= pos_.top + pos_.height * border) {
+            if (x >= pos_.left + pos_.width * (1.0f - border) && y <= pos_.top + pos_.height * border) {
                 mainWindow.RegisterResized(this, MainWindow::ResizeDirection::TopRight);
                 return;
             }
@@ -239,7 +239,7 @@ namespace OGUI
                 mainWindow.RegisterResized(this, MainWindow::ResizeDirection::TopLeft);
                 return;
             }
-            if (x >= pos_.left + (pos_.width * 1.0f - border)) {
+            if (x >= pos_.left + pos_.width * (1.0f - border)) {
                 mainWindow.RegisterResized(this, MainWindow::ResizeDirection::Right);
                 return;
             }
