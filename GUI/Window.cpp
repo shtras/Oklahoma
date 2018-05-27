@@ -17,8 +17,8 @@ namespace OGUI
         Renderer& renderer = Renderer::GetInstance();
         float scrollWidth = 50 / (float)renderer.GetWidth();
         float scrollHeight = 50 / (float)renderer.GetHeight();
-        scrollBars_[ScrollBar::VERTICAL] = new ScrollBar(this, {1.0f - scrollWidth - 2 * renderer.GetPixelWidth(), 2 * renderer.GetPixelHeight(), scrollWidth, 1.0f - scrollHeight}, ScrollBar::VERTICAL);
-        scrollBars_[ScrollBar::HORIZONTAL] = new ScrollBar(this, {0.0f, 1.0f - scrollHeight, 1.0f - scrollWidth, scrollHeight}, ScrollBar::HORIZONTAL);
+        scrollBars_[ScrollBar::VERTICAL] = std::make_shared<ScrollBar>(this, Rect({1.0f - scrollWidth - 2 * renderer.GetPixelWidth(), 2 * renderer.GetPixelHeight(), scrollWidth, 1.0f - scrollHeight}), ScrollBar::VERTICAL);
+        scrollBars_[ScrollBar::HORIZONTAL] = std::make_shared<ScrollBar>(this, Rect({0.0f, 1.0f - scrollHeight, 1.0f - scrollWidth, scrollHeight}), ScrollBar::HORIZONTAL);
         AddWidget(scrollBars_[ScrollBar::VERTICAL]);
         AddWidget(scrollBars_[ScrollBar::HORIZONTAL]);
     }
@@ -52,7 +52,7 @@ namespace OGUI
         RecalcContents();
     }
 
-    void Window::AddWidget(SmartPtr<Widget> widget)
+    void Window::AddWidget(std::shared_ptr<Widget> widget)
     {
         Widget::AddWidget(widget);
         RecalcContents();
@@ -132,20 +132,20 @@ namespace OGUI
         switch (type)
         {
         case OGUI::ScrollBar::VERTICAL:
-            arrow1_ = new Button({ 0.0f, 0.0f, 1.0f, 0.1f });
+            arrow1_ = std::make_shared<Button>(Rect({ 0.0f, 0.0f, 1.0f, 0.1f }));
             arrow1_->Init({ 183, 185, 196, 199, 22, 22, 38, 38 });
             AddWidget(arrow1_);
-            arrow1_->F = bind(&ScrollBar::ScrollUp, this);
-            arrow2_ = new Button({ 0.0f, 0.9f, 1.0f, 0.1f });
+            arrow1_->F = std::bind(&ScrollBar::ScrollUp, this);
+            arrow2_ = std::make_shared<Button>(Rect({ 0.0f, 0.9f, 1.0f, 0.1f }));
             arrow2_->Init({ 183, 185, 196, 199, 38, 38, 22, 22 });
             AddWidget(arrow2_);
-            arrow2_->F = bind(&ScrollBar::ScrollDown, this);
+            arrow2_->F = std::bind(&ScrollBar::ScrollDown, this);
             break;
         case OGUI::ScrollBar::HORIZONTAL:
-            arrow1_ = new Button({ 0.0f, 0.0f, 0.1f, 1.0f });
+            arrow1_ = std::make_shared<Button>(Rect({ 0.0f, 0.0f, 0.1f, 1.0f }));
             arrow1_->Init({ 201, 203, 214, 216, 22, 22, 38, 38 });
             AddWidget(arrow1_);
-            arrow2_ = new Button({ 0.9f, 0.0f, 0.1f, 1.0f });
+            arrow2_ = std::make_shared<Button>(Rect({ 0.9f, 0.0f, 0.1f, 1.0f }));
             arrow2_->Init({ 216, 214, 203, 201, 22, 22, 38, 38 });
             AddWidget(arrow2_);
             break;

@@ -14,7 +14,7 @@ namespace OGUI {
 
     }
 
-    void Label::SetText(wstring& str)
+    void Label::SetText(std::wstring& str)
     {
         text_ = str;
     }

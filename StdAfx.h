@@ -11,7 +11,6 @@
 #include <list>
 #include <functional>
 #include <algorithm>
-using namespace std;
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -20,7 +19,6 @@ using namespace std;
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "SmartPtr.h"
 #include "helpers.h"
 #include "Log.h"
 

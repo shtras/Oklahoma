@@ -20,10 +20,10 @@ namespace OGraphics
         bool operator == (const Rect& other) const { return left == other.left && top == other.top && width == other.width && height == other.height; }
         bool operator != (const Rect& other) const { return !(*this == other); }
         Rect Intersect(const Rect& other) const {
-            float rLeft = max(left, other.left);
-            float rRight = min(left + width, other.left + other.width);
-            float rTop = max(top, other.top);
-            float rBottom = min(top + height, other.top + other.height);
+            float rLeft = std::max(left, other.left);
+            float rRight = std::min(left + width, other.left + other.width);
+            float rTop = std::max(top, other.top);
+            float rBottom = std::min(top + height, other.top + other.height);
             return{rLeft, rTop, rRight - rLeft, rBottom - rTop};
         }
     };

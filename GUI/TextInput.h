@@ -24,9 +24,9 @@ namespace OGUI
         void GetPosition(int x, int y, float* fx, float* fy);
         bool HasSelection();
         void RenderCursor();
-        vector<wstring> text_;
+        std::vector<std::wstring> text_;
         wchar_t GetChar(wchar_t c, SDL_Keysym& sym);
-        map<wchar_t, wchar_t> shiftChars_;
+        std::map<wchar_t, wchar_t> shiftChars_;
         int cursorX_;
         int cursorY_;
         int selectStartX_;
@@ -35,7 +35,7 @@ namespace OGUI
         int selectEndY_;
         Rect cursorUVs_;
         Rect selectionUVs_;
-        set<wchar_t> wordChars_;
+        std::set<wchar_t> wordChars_;
         int charWidth_;
         int charHeight_;
         bool multiline_;

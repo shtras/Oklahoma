@@ -19,9 +19,8 @@ namespace ODiagnostics
         Rotate();
         SYSTEMTIME timeNow;
         GetSystemTime(&timeNow);
-        wchar_t logLine[1024];
-        wchar_t timeFormat[] = L"%.2d:%.2d:%.2d.%.3d - %ls:  ";
-        swprintf_s(logLine, timeFormat, timeNow.wHour, timeNow.wMinute, timeNow.wSecond, timeNow.wMilliseconds, SeverityToString(s));
+        wchar_t logLine[1024] = { 0 };
+        swprintf_s(logLine, L"%.2d:%.2d:%.2d.%.3d - %ls:  ", timeNow.wHour, timeNow.wMinute, timeNow.wSecond, timeNow.wMilliseconds, SeverityToString(s));
         if (timeLength_ == 0) {
             timeLength_ = wcslen(logLine);
         }
@@ -36,7 +35,7 @@ namespace ODiagnostics
 
     }
 
-    Logger::Logger():
+    Logger::Logger() noexcept :
         sev_(LOG_INFO),
         file_(nullptr),
         timeLength_(0),
@@ -60,7 +59,7 @@ namespace ODiagnostics
             CloseHandle(file_);
         }
         GetSystemTime(&logDate_);
-        wchar_t path[O_MAX_PATH];
+        wchar_t path[O_MAX_PATH] = { 0 };
         if (!DirectoryExists(L"Logs")) {
             CreateDirectory(L"Logs", 0);
         }

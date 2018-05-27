@@ -9,7 +9,7 @@ public:
     void Init();
     void Quit();
 private:
-    Oklahoma();
+    Oklahoma() noexcept;
     ~Oklahoma();
 
     bool running_;

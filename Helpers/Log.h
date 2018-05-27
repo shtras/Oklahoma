@@ -19,7 +19,7 @@ namespace ODiagnostics
         void Flush();
         void SetSeverity(Severity s);
     private:
-        Logger();
+        Logger() noexcept;
         ~Logger();
 
         void NewFile();

@@ -14,7 +14,7 @@ namespace OGUI
         bool HandleMouseEvent(SDL_Event& event, float x, float y) override;
         void HandleKeyboardEvent(SDL_Event& event) override;
     private:
-        MainWindow();
+        MainWindow() noexcept;
         ~MainWindow();
         Widget* hoveredWidget_;
         Widget* pressedWidget_;

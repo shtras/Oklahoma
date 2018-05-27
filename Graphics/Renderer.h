@@ -7,7 +7,7 @@ namespace OGraphics
     class Shader
     {
     public:
-        Shader();
+        Shader() noexcept;
         ~Shader();
 
         void Load(const wchar_t* vert, const wchar_t* frag);
@@ -19,7 +19,9 @@ namespace OGraphics
     class Texture
     {
     public:
-        Texture();
+        Texture() noexcept;
+        Texture(Texture& other) = delete;
+        Texture(Texture&& other) = delete;
         ~Texture();
         void Load(const char* path);
         const GLuint GetTextureID() const;
@@ -48,7 +50,7 @@ namespace OGraphics
         void SetShader(ShaderType shader);
         void SetCharSize(int width, int height);
         void ResetCharSize();
-        const Texture* GetTexture(TextureType type);
+        std::shared_ptr<Texture> GetTexture(TextureType type);
         int GetWidth() const;
         int GetHeight() const;
         bool IsFontSymbol(wchar_t) const;
@@ -58,8 +60,8 @@ namespace OGraphics
         float GetPixelWidth() const;
         float GetPixelHeight() const;
     private:
-        Renderer();
-        Renderer(const Renderer& other);
+        Renderer() noexcept;
+        Renderer(const Renderer& other) = delete;
         ~Renderer();
         void FLush();
         void Destroy();
@@ -85,14 +87,14 @@ namespace OGraphics
         float charHeight_;
         float charWidthLast_;
         float charHeightLast_;
-        list<Rect> boundRectQueue_;
+        std::list<Rect> boundRectQueue_;
 
         glm::mat4 mvp_;
-        SmartPtr<Shader> shader_;
-        SmartPtr<Texture> texture_;
-        map<TextureType, SmartPtr<Texture>> textures_;
-        map<ShaderType, SmartPtr<Shader>> shaders_;
-        map<wchar_t, Rect> textUVs_;
+        std::shared_ptr<Shader> shader_;
+        std::shared_ptr<Texture> texture_;
+        std::map<TextureType, std::shared_ptr<Texture>> textures_;
+        std::map<ShaderType, std::shared_ptr<Shader>> shaders_;
+        std::map<wchar_t, Rect> textUVs_;
         
         int dbgFlushes_;
         int dbgVertices_;

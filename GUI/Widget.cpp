@@ -65,7 +65,7 @@ namespace OGUI
         Renderer& renderer = Renderer::GetInstance();
         int width = renderer.GetWidth();
         int height = renderer.GetHeight();
-        const Texture* tex = renderer.GetTexture(Renderer::TEX_GUI);
+        auto tex = renderer.GetTexture(Renderer::TEX_GUI);
         float fl1 = texPos.l1 / (float)tex->GetWidth();
         float fl2 = texPos.l2 / (float)tex->GetWidth();
         float fl3 = texPos.l3 / (float)tex->GetWidth();
@@ -219,9 +219,9 @@ namespace OGUI
 
     void Widget::MoveToTop(Widget* w)
     {
-        SmartPtr<Widget> sp;
+        std::shared_ptr<Widget> sp;
         for (auto& itr : children_) {
-            if (itr == w) {
+            if (itr.get() == w) {
                 sp = itr;
                 break;
             }
@@ -285,7 +285,7 @@ namespace OGUI
         keyFocus_ = val;
     }
 
-    void Widget::AddWidget(SmartPtr<Widget> widget)
+    void Widget::AddWidget(std::shared_ptr<Widget> widget)
     {
         children_.push_back(widget);
         widget->Resize(pos_);

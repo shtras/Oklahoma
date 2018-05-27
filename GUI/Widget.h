@@ -19,7 +19,7 @@ namespace OGUI
         Widget(Rect pos);
         virtual ~Widget();
         virtual void Render();
-        virtual void AddWidget(SmartPtr<Widget> widget);
+        virtual void AddWidget(std::shared_ptr<Widget> widget);
         virtual bool HandleMouseEvent(SDL_Event& event, float x, float y);
         void ToggleHovered(bool val);
         void TogglePressed(bool val);
@@ -55,7 +55,7 @@ namespace OGUI
         OGraphics::Rect hoveredUVs_[9];
         OGraphics::Rect pressedUVs_[9];
         OGraphics::Rect rects_[9];
-        list<SmartPtr<Widget>> children_;
+        std::list<std::shared_ptr<Widget>> children_;
         int texState_;
         bool hovered_;
         bool pressed_;

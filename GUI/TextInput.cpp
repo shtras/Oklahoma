@@ -22,8 +22,8 @@ namespace OGUI {
         for (wchar_t c = L'a'; c <= L'z'; ++c) {
             shiftChars_[c] = c - L'a' + L'A';
         }
-        wstring str1 = L"1234567890-=[];'\\,./";
-        wstring str2 = L"!@#$%^&*()_+{}:\"|<>?";
+        std::wstring str1 = L"1234567890-=[];'\\,./";
+        std::wstring str2 = L"!@#$%^&*()_+{}:\"|<>?";
         assert(str1.length() == str2.length());
         for (int i = 0; i < str1.length(); ++i) {
             shiftChars_[str1[i]] = str2[i];
@@ -31,9 +31,9 @@ namespace OGUI {
         cursorUVs_ = { 5, 176, 12, 22 };
         Renderer::GetInstance().InitUVs(cursorUVs_, Renderer::TEX_FONT);
         Renderer::GetInstance().InitUVs(selectionUVs_, Renderer::TEX_FONT);
-        wstring strWordChars = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
-        for (int i = 0; i < strWordChars.length(); ++i) {
-            wordChars_.insert(strWordChars[i]);
+        std::wstring strWordChars = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
+        for (auto c: strWordChars) {
+            wordChars_.insert(c);
         }
         text_.push_back(L"");
     }
@@ -74,11 +74,11 @@ namespace OGUI {
                 int y1 = selectStartY_;
                 int y2 = selectEndY_;
                 if (y1 > y2) {
-                    swap(y1, y2);
-                    swap(x1, x2);
+                    std::swap(y1, y2);
+                    std::swap(x1, x2);
                 }
                 if (y1 == y2 && x2 < x1) {
-                    swap(x1, x2);
+                    std::swap(x1, x2);
                 }
                 for (int y = y1; y <= y2; ++y) {
                     Rect selectionPos = { pos_.left, pos_.top + y * charHeight_ * renderer.GetPixelHeight(), charWidth_ * text_[y].length() * renderer.GetPixelWidth(), charHeight_ * renderer.GetPixelHeight() };
@@ -195,12 +195,12 @@ namespace OGUI {
         int startX = selectStartX_;
         int endX = selectEndX_;
         if (endY < startY) {
-            swap(startY, endY);
-            swap(startX, endX);
+            std::swap(startY, endY);
+            std::swap(startX, endX);
         }
 
         if (selectStartX_ > selectEndX_) {
-            swap(selectStartX_, selectEndX_);
+            std::swap(selectStartX_, selectEndX_);
         }
 
         if (startY != endY) {
@@ -215,7 +215,7 @@ namespace OGUI {
         selectEndX_ = selectStartX_;
         selectEndY_ = selectStartY_;
         if (startY == endY) {
-            startX = min(selectStartX_, selectEndX_);
+            startX = std::min(selectStartX_, selectEndX_);
         }
         MoveCursor(startX, selectStartY_, false);
     }

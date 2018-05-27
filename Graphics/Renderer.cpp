@@ -5,7 +5,7 @@
 namespace OGraphics
 {
 #define GLERR {GLenum e; if ((e = glGetError()) != GL_NO_ERROR) {LogError(L"%hs:%d - OpenGL error: %x", __FUNCTION__, __LINE__, e);assert(0);}}
-    Shader::Shader() :
+    Shader::Shader() noexcept :
         programId_(0)
     {
 
@@ -58,8 +58,9 @@ namespace OGraphics
         // Check Vertex Shader
         glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
         glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+        ++InfoLogLength;
         if (InfoLogLength > 0) {
-            std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
+            std::vector<char> VertexShaderErrorMessage(InfoLogLength);
             glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
             LogError(L"Error in vertex shader: %hs", &VertexShaderErrorMessage[0]);
         }
@@ -72,8 +73,9 @@ namespace OGraphics
         // Check Fragment Shader
         glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
         glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+        ++InfoLogLength;
         if (InfoLogLength > 0) {
-            std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
+            std::vector<char> FragmentShaderErrorMessage(InfoLogLength);
             glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
             LogError(L" Error in fragment shader: %hs", &FragmentShaderErrorMessage[0]);
         }
@@ -87,8 +89,9 @@ namespace OGraphics
         // Check the program
         glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
         glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+        ++InfoLogLength;
         if (InfoLogLength > 0) {
-            std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
+            std::vector<char> ProgramErrorMessage(InfoLogLength);
             glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
             LogError(L"Error in shader link: %hs", &ProgramErrorMessage[0]);
         }
@@ -107,8 +110,10 @@ namespace OGraphics
         return programId_;
     }
 
-    Texture::Texture():
-        textureID_(0)
+    Texture::Texture() noexcept:
+        textureID_(0),
+        width_(-1),
+        height_(-1)
     {
 
     }
@@ -156,7 +161,7 @@ namespace OGraphics
         return height_;
     }
 
-    Renderer::Renderer() :
+    Renderer::Renderer() noexcept :
         mainWindow_(nullptr),
         mainGLContext_(nullptr),
         numVertices_(0),
@@ -376,7 +381,7 @@ namespace OGraphics
         charHeight_ = charHeightLast_;
     }
 
-    const Texture* Renderer::GetTexture(TextureType type)
+    std::shared_ptr<Texture> Renderer::GetTexture(TextureType type)
     {
         return textures_[type];
     }
@@ -414,7 +419,7 @@ namespace OGraphics
 
     void Renderer::InitUVs(Rect& uvs, TextureType type)
     {
-        const Texture* tex = GetTexture(type);
+        auto tex = GetTexture(type);
         uvs.left /= (float)tex->GetWidth();
         uvs.width /= (float)tex->GetWidth();
         uvs.top /= (float)tex->GetHeight();
@@ -448,14 +453,14 @@ namespace OGraphics
 
     void Renderer::LoadTexture(const char* path, TextureType type)
     {
-        SmartPtr<Texture> texture = new Texture();
+        auto texture = std::make_shared<Texture>();
         texture->Load(path);
         textures_[type] = texture;
     }
 
     void Renderer::LoadShader(const wchar_t* vert, const wchar_t* frag, ShaderType type)
     {
-        SmartPtr<Shader> shader = new Shader();
+        auto shader = std::make_shared<Shader>();
         shader->Load(vert, frag);
         shaders_[type] = shader;
     }
@@ -468,19 +473,19 @@ namespace OGraphics
         int texHeight = textures_[TEX_FONT]->GetHeight();
         float fCharWidth = charWidth / (float)texWidth;
         float fCharHeight = charHeight / (float)texHeight;
-        wifstream f(L"Textures\\font.txt", ios::in);
+        std::wifstream f(L"Textures\\font.txt", std::ios::in);
         if (!f.is_open()) {
             LogError(L"Failed to open characters file");
             return;
         }
-        vector<wstring> fontLines;
-        wstring s;
+        std::vector<std::wstring> fontLines;
+        std::wstring s;
         while (getline(f, s)) {
             fontLines.push_back(s);
         }
         f.close();
         for (int i = 0; i < fontLines.size(); ++i) {
-            wstring& sitr = fontLines[i];
+            std::wstring& sitr = fontLines[i];
             for (int x = 0; x <= sitr.size(); ++x) {
                 textUVs_[sitr[x]] = { x * fCharWidth, i * fCharHeight, fCharWidth, fCharHeight };
             }

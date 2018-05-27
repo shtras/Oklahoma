@@ -74,6 +74,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <CodeAnalysisRuleSet>NativeMinimumRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <EnableCppCoreCheck>false</EnableCppCoreCheck>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -105,6 +108,7 @@
       <AdditionalIncludeDirectories>.;SDL;Graphics;Helpers;GUI</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>
       </RuntimeTypeInfo>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -168,7 +172,6 @@
     <ClCompile Include="GUI\Window.cpp" />
     <ClCompile Include="Helpers\helpers.cpp" />
     <ClCompile Include="Helpers\Log.cpp" />
-    <ClCompile Include="Helpers\SmartPtr.cpp" />
     <ClCompile Include="Oklahoma.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -187,7 +190,6 @@
     <ClInclude Include="GUI\Window.h" />
     <ClInclude Include="Helpers\helpers.h" />
     <ClInclude Include="Helpers\Log.h" />
-    <ClInclude Include="Helpers\SmartPtr.h" />
     <ClInclude Include="Oklahoma.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="Version.h" />

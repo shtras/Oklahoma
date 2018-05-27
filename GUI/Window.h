@@ -19,8 +19,8 @@ namespace OGUI
     protected:
         void ScrollUp();
         void ScrollDown();
-        Button* arrow1_;
-        Button* arrow2_;
+        std::shared_ptr<Button> arrow1_;
+        std::shared_ptr<Button> arrow2_;
         Window* wnd_;
         float y_;
         float height_;
@@ -34,13 +34,13 @@ namespace OGUI
         ~Window();
         void Render() override;
         void ToggleScrollBar(ScrollBar::ScrollBarType type, bool val);
-        void AddWidget(SmartPtr<Widget> widget) override;
+        void AddWidget(std::shared_ptr<Widget> widget) override;
         void Scroll(float dx, float dy);
         void OnChildMove(Widget* w) override;
         void HandleMouseEventSelf(SDL_Event& event, float x, float y) override;
     protected:
         void RecalcContents();
-        ScrollBar* scrollBars_[ScrollBar::MAX_TYPE];
+        std::shared_ptr<ScrollBar> scrollBars_[ScrollBar::MAX_TYPE];
         float totalHeight_;
         float scrollTop_;
         bool verticalScroll_;

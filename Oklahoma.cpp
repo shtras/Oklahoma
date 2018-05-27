@@ -52,16 +52,16 @@ void PerfTest()
     MainWindow& mainWindow = MainWindow::GetInstance();
     for (int i = 0; i < 20; ++i) {
         for (int j = 0; j < 20; ++j) {
-            Window* w = new Window({ i*0.05f, j*0.05f, 0.05f, 0.05f });
+            auto w = std::make_shared<Window>(Rect({ i*0.05f, j*0.05f, 0.05f, 0.05f }));
             mainWindow.AddWidget(w);
-            Window* wItr = w;
-            Window* wItrNext;
+            std::shared_ptr<Window> wItr = w;
+            std::shared_ptr<Window> wItrNext = nullptr;
             for (int k = 0; k < 5; ++k) {
-                wItrNext = new Window({ 0.1f, 0.1f, 0.8f, 0.8f });
+                wItrNext = std::make_shared<Window>(Rect({ 0.1f, 0.1f, 0.8f, 0.8f }));
                 wItr->AddWidget(wItrNext);
                 wItr = wItrNext;
             }
-            Button* b = new Button({ 0.1f, 0.9f, 0.8f, 0.1f });
+            auto b = std::make_shared<Button>(Rect({ 0.1f, 0.9f, 0.8f, 0.1f }));
             b->SetText(L"Hello!");
             wItr->AddWidget(b);
         }
@@ -77,10 +77,10 @@ void Oklahoma::Run()
     Renderer& renderer = Renderer::GetInstance();
     MainWindow& mainWindow = MainWindow::GetInstance();
     
-    Window* w = new Window({ 0.1f, 0.1f, 0.8f, 0.8f });
+    auto w = std::make_shared<Window>(Rect({ 0.1f, 0.1f, 0.8f, 0.8f }));
     w->ToggleScrollBar(ScrollBar::VERTICAL, true);
-    Button* btn = new Button({ 0.4f, 0.8f, 0.2f, 0.1f });
-    btn->F = bind(&Oklahoma::Quit, this);
+    auto btn = std::make_shared<Button>(Rect({ 0.4f, 0.8f, 0.2f, 0.1f }));
+    btn->F = std::bind(&Oklahoma::Quit, this);
     btn->SetText(L"OK!");
     w->AddWidget(btn);
 
@@ -95,17 +95,17 @@ void Oklahoma::Run()
 //     }
 //     w->AddWidget(w1);
 
-    TextInput* inp = new TextInput({0.1f, 0.1f, 0.8f, 0.5f});
+    auto inp = std::make_shared<TextInput>(Rect({0.1f, 0.1f, 0.8f, 0.5f}));
     inp->SetMultiline(true);
     w->AddWidget(inp);
 
-    TextInput* inp1 = new TextInput({ 0.1f, 0.7f, 0.8f, 0.1f });
+    auto inp1 = std::make_shared<TextInput>(Rect({ 0.1f, 0.7f, 0.8f, 0.1f }));
     w->AddWidget(inp1);
 
     mainWindow.AddWidget(w);
 
     //PerfTest();
-    Label* fpsText = new Label({ 0.0f, 0.9f, 0.1f, 0.1f });
+    auto fpsText = std::make_shared<Label>(Rect({ 0.0f, 0.9f, 0.1f, 0.1f }));
     mainWindow.AddWidget(fpsText);
     while (running_) {
         SDL_Event event;
@@ -162,7 +162,7 @@ void Oklahoma::Quit()
     running_ = false;
 }
 
-Oklahoma::Oklahoma() :
+Oklahoma::Oklahoma() noexcept :
     running_(true)
 {
 

@@ -8,10 +8,10 @@ namespace OGUI
     public:
         Label(Rect pos);
         ~Label();
-        void SetText(wstring& str);
+        void SetText(std::wstring& str);
         void SetText(const wchar_t* str);
         void Render() override;
     protected:
-        wstring text_;
+        std::wstring text_;
     };
 }

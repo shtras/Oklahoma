@@ -4,7 +4,7 @@
 
 namespace OGUI
 {
-    MainWindow::MainWindow():
+    MainWindow::MainWindow() noexcept :
         Widget({ 0.0f, 0.0f, 1.0f, 1.0f }),
         hoveredWidget_(nullptr),
         pressedWidget_(nullptr),

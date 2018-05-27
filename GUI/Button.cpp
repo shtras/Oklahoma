@@ -6,7 +6,7 @@ namespace OGUI
 
     Button::Button(Rect pos) :
         Widget(pos),
-        label_(new Label({ 0.0f, 0.0f, 1.0f, 1.0f }))
+        label_(std::make_shared<Label>(Rect({ 0.0f, 0.0f, 1.0f, 1.0f })))
     {
         AddWidget(label_);
         Init({ 168, 172, 184, 187, 2, 4, 16, 19 });
@@ -19,7 +19,7 @@ namespace OGUI
     {
     }
 
-    void Button::SetText(wstring& str)
+    void Button::SetText(std::wstring& str)
     {
         label_->SetText(str);
     }
