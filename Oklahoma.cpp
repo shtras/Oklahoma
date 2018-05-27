@@ -28,9 +28,9 @@ int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance
         L"Release"
 #endif
         , __DATE__, __TIME__, GIT_HASH, GIT_BRANCH);
-    Oklahoma& oklahoma = Oklahoma::GetInstance();
-    oklahoma.Init();
-    oklahoma.Run();
+    auto oklahoma = std::make_shared<Oklahoma>();
+    oklahoma->Init();
+    oklahoma->Run();
     LogInfo(L"Bye.");
 
 #ifdef DEBUG
@@ -39,15 +39,9 @@ int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance
     return 0;
 }
 
-Oklahoma& Oklahoma::GetInstance()
+void Oklahoma::PerfTest()
 {
-    static Oklahoma instance;
-    return instance;
-}
-
-void PerfTest()
-{
-    MainWindow& mainWindow = MainWindow::GetInstance();
+    auto& mainWindow = MainWindow::GetInstance();
     for (int i = 0; i < 20; ++i) {
         for (int j = 0; j < 20; ++j) {
             auto w = std::make_shared<Window>(Rect({ i*0.05f, j*0.05f, 0.05f, 0.05f }));
@@ -66,48 +60,53 @@ void PerfTest()
     }
 }
 
+void Oklahoma::RegularTest()
+{
+    auto& mainWindow = MainWindow::GetInstance();
+    //     auto w00 = std::make_shared<Window>(Rect({ 0.0f, 0.0f, 1.0f, 1.0f }));
+    //     mainWindow.AddWidget(w00);
+
+    auto w = std::make_shared<Window>(Rect({ 0.1f, 0.1f, 0.8f, 0.8f }));
+    //     w->ToggleScrollBar(ScrollBar::VERTICAL, true);
+    //     auto btn = std::make_shared<Button>(Rect({ 0.4f, 0.8f, 0.2f, 0.1f }));
+    //     btn->F = std::bind(&Oklahoma::Quit, this);
+    //     btn->SetText(L"OK!");
+    //     w->AddWidget(btn);
+
+    auto w0 = std::make_shared<Window>(Rect({ 0.1f, 0.3f, 0.5f, 0.4f }));
+    w->AddWidget(w0);
+
+    auto w1 = std::make_shared<Window>(Rect({ 0.6f, 0.3f, 0.2f, 0.4f }));
+    //    w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
+    //     for (int i = 0; i < 15; ++i) {
+    //         auto l = std::make_shared<Label>(Rect({ 0.1f, i * 0.15f, 0.8f, 0.15f }));
+    //         wchar_t txt[128];
+    //         swprintf_s(txt, L"Labeliko # %d", i);
+    //         l->SetText(txt);
+    //         w1->AddWidget(l);
+    //     }
+    w->AddWidget(w1);
+
+    //     auto inp = std::make_shared<TextInput>(Rect({0.1f, 0.1f, 0.8f, 0.5f}));
+    //     inp->SetMultiline(true);
+    //     w->AddWidget(inp);
+
+    auto inp1 = std::make_shared<TextInput>(Rect({ 0.1f, 0.7f, 0.8f, 0.1f }));
+    w->AddWidget(inp1);
+
+    mainWindow.AddWidget(w);
+}
+
 void Oklahoma::Run()
 {
     int lastTicks = SDL_GetTicks();
     int fpsTickBase = lastTicks;
     int frames = 0;
     wchar_t fpsStr[128];
-    Renderer& renderer = Renderer::GetInstance();
-    MainWindow& mainWindow = MainWindow::GetInstance();
+    auto& renderer = Renderer::GetInstance();
+    auto& mainWindow = MainWindow::GetInstance();
     
-//     auto w00 = std::make_shared<Window>(Rect({ 0.0f, 0.0f, 1.0f, 1.0f }));
-//     mainWindow.AddWidget(w00);
-
-     auto w = std::make_shared<Window>(Rect({ 0.1f, 0.1f, 0.8f, 0.8f }));
-//     w->ToggleScrollBar(ScrollBar::VERTICAL, true);
-//     auto btn = std::make_shared<Button>(Rect({ 0.4f, 0.8f, 0.2f, 0.1f }));
-//     btn->F = std::bind(&Oklahoma::Quit, this);
-//     btn->SetText(L"OK!");
-//     w->AddWidget(btn);
-
-    auto w0 = std::make_shared<Window>(Rect({ 0.1f, 0.3f, 0.5f, 0.4f }));
-    w->AddWidget(w0);
-
-    auto w1 = std::make_shared<Window>(Rect({ 0.6f, 0.3f, 0.2f, 0.4f }));
-//    w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
-//     for (int i = 0; i < 15; ++i) {
-//         auto l = std::make_shared<Label>(Rect({ 0.1f, i * 0.15f, 0.8f, 0.15f }));
-//         wchar_t txt[128];
-//         swprintf_s(txt, L"Labeliko # %d", i);
-//         l->SetText(txt);
-//         w1->AddWidget(l);
-//     }
-    w->AddWidget(w1);
-
-//     auto inp = std::make_shared<TextInput>(Rect({0.1f, 0.1f, 0.8f, 0.5f}));
-//     inp->SetMultiline(true);
-//     w->AddWidget(inp);
-
-    auto inp1 = std::make_shared<TextInput>(Rect({ 0.1f, 0.7f, 0.8f, 0.1f }));
-    w->AddWidget(inp1);
-
-    mainWindow.AddWidget(w);
-
+    RegularTest();
     //PerfTest();
     auto fpsText = std::make_shared<Label>(Rect({ 0.0f, 0.9f, 0.1f, 0.1f }));
     mainWindow.AddWidget(fpsText);

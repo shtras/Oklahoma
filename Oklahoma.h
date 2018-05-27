@@ -4,13 +4,16 @@
 class Oklahoma
 {
 public:
-    static Oklahoma& GetInstance();
+    Oklahoma() noexcept;
+    ~Oklahoma();
+
     void Run();
     void Init();
     void Quit();
+
+    void PerfTest();
+    void RegularTest();
 private:
-    Oklahoma() noexcept;
-    ~Oklahoma();
 
     bool running_;
 };
