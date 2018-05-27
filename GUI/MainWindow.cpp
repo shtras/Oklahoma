@@ -64,6 +64,21 @@ namespace OGUI
         draggedWidget_ = w;
     }
 
+    void MainWindow::RegisterResized(Widget* w, ResizeDirection dir)
+    {
+        if (w == resizedWidget_) {
+            return;
+        }
+        if (w) {
+            w->ToggleResized(true);
+        }
+        if (resizedWidget_) {
+            resizedWidget_->ToggleResized(false);
+        }
+        resizedWidget_ = w;
+        resizeDir_ = dir;
+    }
+
     void MainWindow::RegisterKeyboardListener(Widget* w)
     {
         if (w == keyboardListenerWidget_) {
@@ -80,12 +95,51 @@ namespace OGUI
 
     bool MainWindow::HandleMouseEvent(SDL_Event& event, float x, float y)
     {
+        auto& renderer = Renderer::GetInstance();
         if (event.type == SDL_MOUSEMOTION) {
             mx_ = x;
             my_ = y;
             if (draggedWidget_) {
-                Renderer& renderer = Renderer::GetInstance();
                 draggedWidget_->Move(x, y, event.motion.xrel / (float)renderer.GetWidth(), event.motion.yrel / (float)renderer.GetHeight());
+                return true;
+            }
+            if (resizedWidget_) {
+                switch (resizeDir_)
+                {
+                case OGUI::MainWindow::ResizeDirection::None:
+                    break;
+                case OGUI::MainWindow::ResizeDirection::TopLeft:
+                    resizedWidget_->Resize(-event.motion.xrel / (float)renderer.GetWidth(), -event.motion.yrel / (float)renderer.GetHeight());
+                    resizedWidget_->Move(x, y, event.motion.xrel / (float)renderer.GetWidth(), event.motion.yrel / (float)renderer.GetHeight());
+                    break;
+                case OGUI::MainWindow::ResizeDirection::Top:
+                    resizedWidget_->Resize(0, -event.motion.yrel / (float)renderer.GetHeight());
+                    resizedWidget_->Move(x, y, 0, event.motion.yrel / (float)renderer.GetHeight());
+                    break;
+                case OGUI::MainWindow::ResizeDirection::TopRight:
+                    resizedWidget_->Resize(event.motion.xrel / (float)renderer.GetWidth(), -event.motion.yrel / (float)renderer.GetHeight());
+                    resizedWidget_->Move(x, y, 0, event.motion.yrel / (float)renderer.GetHeight());
+                    break;
+                case OGUI::MainWindow::ResizeDirection::Right:
+                    resizedWidget_->Resize(event.motion.xrel / (float)renderer.GetWidth(), 0);
+                    break;
+                case OGUI::MainWindow::ResizeDirection::BottomRight:
+                    resizedWidget_->Resize(event.motion.xrel / (float)renderer.GetWidth(), event.motion.yrel / (float)renderer.GetHeight());
+                    break;
+                case OGUI::MainWindow::ResizeDirection::Bottom:
+                    resizedWidget_->Resize(0, event.motion.yrel / (float)renderer.GetHeight());
+                    break;
+                case OGUI::MainWindow::ResizeDirection::BottomLeft:
+                    resizedWidget_->Resize(-event.motion.xrel / (float)renderer.GetWidth(), event.motion.yrel / (float)renderer.GetHeight());
+                    resizedWidget_->Move(x, y, event.motion.xrel / (float)renderer.GetWidth(), 0);
+                    break;
+                case OGUI::MainWindow::ResizeDirection::Left:
+                    resizedWidget_->Resize(-event.motion.xrel / (float)renderer.GetWidth(), 0);
+                    resizedWidget_->Move(x, y, event.motion.xrel / (float)renderer.GetWidth(), 0);
+                    break;
+                default:
+                    break;
+                }
                 return true;
             }
         }

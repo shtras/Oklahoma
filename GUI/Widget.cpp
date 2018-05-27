@@ -7,11 +7,14 @@ namespace OGUI
     static int NumWidgets = 0;
     Widget::Widget(Rect pos) :
         pos_(pos),
+        relativePos_(pos),
         hovered_(false),
         pressed_(false),
         dragged_(false),
+        resized_(false),
         clickable_(false),
         draggable_(false),
+        resizable_(false),
         interactive_(true),
         visible_(true),
         keyFocus_(false),
@@ -138,16 +141,42 @@ namespace OGUI
         RenderChildren();
     }
 
-    void Widget::Resize(Rect containingRect)
+    void Widget::Fit(Rect containingRect)
     {
-        pos_.left = containingRect.left + pos_.left * containingRect.width;
-        pos_.top = containingRect.top + pos_.top * containingRect.height;
-        pos_.width *= containingRect.width;
-        pos_.height *= containingRect.height;
+        pos_.left = containingRect.left + relativePos_.left * containingRect.width;
+        pos_.top = containingRect.top + relativePos_.top * containingRect.height;
+        pos_.width = relativePos_.width * containingRect.width;
+        pos_.height = relativePos_.height * containingRect.height;
         CreateRects();
         for (auto& itr : children_) {
-            itr->Resize(containingRect);
+            itr->Fit(pos_);
         }
+    }
+
+    void Widget::Resize(float dx, float dy)
+    {
+        relativePos_.width += dx / parent_->pos_.width;
+        relativePos_.height += dy / parent_->pos_.height;
+        Fit(parent_->pos_);
+    }
+
+
+    void Widget::Move(float x, float y, float dx, float dy)
+    {
+        if (!parent_->IsWithin(x, y)) {
+            return;
+        }
+        Move(dx, dy);
+    }
+
+    void Widget::Move(float dx, float dy)
+    {
+        relativePos_.left += dx / parent_->pos_.width;
+        relativePos_.top += dy / parent_->pos_.height;
+        if (parent_) {
+            parent_->OnChildMove(this);
+        }
+        Fit(parent_->pos_);
     }
 
     void Widget::RenderChildren()
@@ -188,27 +217,65 @@ namespace OGUI
 
     void Widget::HandleMouseDown(float x, float y)
     {
+        auto& mainWindow = MainWindow::GetInstance();
         if (draggable_ && parent_) {
             parent_->MoveToTop(this);
         }
+        float border = 0.1f;
+        if (resizable_) {
+            if (x >= pos_.left + (pos_.width * 1.0f - border) && y >= pos_.top + pos_.height * (1.0f - border)) {
+                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::BottomRight);
+                return;
+            }
+            if (x <= pos_.left + pos_.width * border && y >= pos_.top + pos_.height * (1.0f - border)) {
+                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::BottomLeft);
+                return;
+            }
+            if (x >= pos_.left + (pos_.width * 1.0f - border) && y <= pos_.top + pos_.height * border) {
+                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::TopRight);
+                return;
+            }
+            if (x <= pos_.left + pos_.width * border && y <= pos_.top + pos_.height * border) {
+                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::TopLeft);
+                return;
+            }
+            if (x >= pos_.left + (pos_.width * 1.0f - border)) {
+                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::Right);
+                return;
+            }
+            if (x <= pos_.left + pos_.width * border) {
+                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::Left);
+                return;
+            }
+            if (y >= pos_.top + pos_.height * (1.0f - border)) {
+                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::Bottom);
+                return;
+            }
+            if (y <= pos_.top + pos_.height * border) {
+                mainWindow.RegisterResized(this, MainWindow::ResizeDirection::Top);
+                return;
+            }
+        }
         if (draggable_) {
-            MainWindow::GetInstance().RegisterDragged(this);
+            mainWindow.RegisterDragged(this);
         } else if (clickable_) {
-            MainWindow::GetInstance().RegisterPressed(this);
+            mainWindow.RegisterPressed(this);
         }
     }
 
     void Widget::HandleMouseUp(float x, float y)
     {
-        MainWindow::GetInstance().RegisterDragged(nullptr);
-        MainWindow::GetInstance().RegisterPressed(nullptr);
+        auto& mainWindow = MainWindow::GetInstance();
+        mainWindow.RegisterDragged(nullptr);
+        mainWindow.RegisterPressed(nullptr);
+        mainWindow.RegisterResized(nullptr, MainWindow::ResizeDirection::None);
         if (clickable_) {
             OnClick();
         }
         if (keyboardListener_) {
-            MainWindow::GetInstance().RegisterKeyboardListener(this);
+            mainWindow.RegisterKeyboardListener(this);
         } else {
-            MainWindow::GetInstance().RegisterKeyboardListener(nullptr);
+            mainWindow.RegisterKeyboardListener(nullptr);
         }
     }
 
@@ -230,33 +297,6 @@ namespace OGUI
         children_.push_back(sp);
         if (parent_) {
             parent_->MoveToTop(this);
-        }
-    }
-
-    void Widget::Move(float x, float y, float dx, float dy)
-    {
-        if (!parent_->IsWithin(x, y)) {
-            return;
-        }
-//         if (!parent_->IsWithin(pos_.left + pos_.width + dx, pos_.top + pos_.height + dy)) {
-//             return;
-//         }
-        Move(dx, dy);
-    }
-
-    void Widget::Move(float dx, float dy)
-    {
-        for (int i = 0; i < 9; ++i) {
-            rects_[i].left += dx;
-            rects_[i].top += dy;
-        }
-        pos_.left += dx;
-        pos_.top += dy;
-        for (auto& itr : children_) {
-            itr->Move(dx, dy);
-        }
-        if (parent_) {
-            parent_->OnChildMove(this);
         }
     }
 
@@ -285,10 +325,15 @@ namespace OGUI
         keyFocus_ = val;
     }
 
+    void Widget::ToggleResized(bool val)
+    {
+        resized_ = val;
+    }
+
     void Widget::AddWidget(std::shared_ptr<Widget> widget)
     {
         children_.push_back(widget);
-        widget->Resize(pos_);
+        widget->Fit(pos_);
         widget->SetParent(this);
     }
 

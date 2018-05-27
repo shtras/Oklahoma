@@ -77,27 +77,33 @@ void Oklahoma::Run()
     Renderer& renderer = Renderer::GetInstance();
     MainWindow& mainWindow = MainWindow::GetInstance();
     
-    auto w = std::make_shared<Window>(Rect({ 0.1f, 0.1f, 0.8f, 0.8f }));
-    w->ToggleScrollBar(ScrollBar::VERTICAL, true);
-    auto btn = std::make_shared<Button>(Rect({ 0.4f, 0.8f, 0.2f, 0.1f }));
-    btn->F = std::bind(&Oklahoma::Quit, this);
-    btn->SetText(L"OK!");
-    w->AddWidget(btn);
+//     auto w00 = std::make_shared<Window>(Rect({ 0.0f, 0.0f, 1.0f, 1.0f }));
+//     mainWindow.AddWidget(w00);
 
-//     Window* w1 = new Window({ 0.1f, 0.3f, 0.8f, 0.4f });
-//     w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
+     auto w = std::make_shared<Window>(Rect({ 0.1f, 0.1f, 0.8f, 0.8f }));
+//     w->ToggleScrollBar(ScrollBar::VERTICAL, true);
+//     auto btn = std::make_shared<Button>(Rect({ 0.4f, 0.8f, 0.2f, 0.1f }));
+//     btn->F = std::bind(&Oklahoma::Quit, this);
+//     btn->SetText(L"OK!");
+//     w->AddWidget(btn);
+
+    auto w0 = std::make_shared<Window>(Rect({ 0.1f, 0.3f, 0.5f, 0.4f }));
+    w->AddWidget(w0);
+
+    auto w1 = std::make_shared<Window>(Rect({ 0.6f, 0.3f, 0.2f, 0.4f }));
+//    w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
 //     for (int i = 0; i < 15; ++i) {
-//         Label* l = new Label({ 0.1f, i * 0.15f, 0.8f, 0.15f });
+//         auto l = std::make_shared<Label>(Rect({ 0.1f, i * 0.15f, 0.8f, 0.15f }));
 //         wchar_t txt[128];
 //         swprintf_s(txt, L"Labeliko # %d", i);
 //         l->SetText(txt);
 //         w1->AddWidget(l);
 //     }
-//     w->AddWidget(w1);
+    w->AddWidget(w1);
 
-    auto inp = std::make_shared<TextInput>(Rect({0.1f, 0.1f, 0.8f, 0.5f}));
-    inp->SetMultiline(true);
-    w->AddWidget(inp);
+//     auto inp = std::make_shared<TextInput>(Rect({0.1f, 0.1f, 0.8f, 0.5f}));
+//     inp->SetMultiline(true);
+//     w->AddWidget(inp);
 
     auto inp1 = std::make_shared<TextInput>(Rect({ 0.1f, 0.7f, 0.8f, 0.1f }));
     w->AddWidget(inp1);

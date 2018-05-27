@@ -12,6 +12,7 @@ namespace OGUI
         horizontalScroll_(false)
     {
         draggable_ = true;
+        resizable_ = true;
         Init({2, 62, 76, 82, 2, 36, 225, 240});
         SetHoveredTexture(85, 2);
         Renderer& renderer = Renderer::GetInstance();

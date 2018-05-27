@@ -25,21 +25,22 @@ namespace OGUI
         void TogglePressed(bool val);
         void ToggleDragged(bool val);
         void ToggleKeyFocus(bool val);
+        void ToggleResized(bool val);
         void Init(TexturePos texPos);
         void SetHoveredTexture(int hoveredX, int hoveredY);
         void SetPressedTexture(int pressedX, int pressedY);
         void Move(float x, float y, float dx, float dy);
-
+        void Resize(float dx, float dy);
         virtual void HandleKeyboardEvent(SDL_Event& event) { assert(0); };
         void SetDraggable(bool value);
         void SetVisible(bool value);
         virtual void OnChildMove(Widget* w);
     protected:
-        Widget();
-        Widget(const Widget& other);
+        Widget() = delete;
+        Widget(const Widget& other) = delete;
         void CreateUVs(OGraphics::Rect* uvs, TexturePos& texPos);
         void CreateRects();
-        void Resize(Rect containingRect);
+        void Fit(Rect containingRect);
         void RenderChildren();
         bool IsWithin(float x, float y);
         virtual void HandleMouseEventSelf(SDL_Event& event, float x, float y);
@@ -50,6 +51,7 @@ namespace OGUI
         void Move(float dx, float dy);
         virtual void OnClick() { };
         Rect pos_;
+        Rect relativePos_;
         TexturePos texPos_;
         OGraphics::Rect uvs_[9];
         OGraphics::Rect hoveredUVs_[9];
@@ -60,12 +62,14 @@ namespace OGUI
         bool hovered_;
         bool pressed_;
         bool dragged_;
+        bool resized_;
         bool visible_;
         bool keyFocus_;
         bool interactive_;
 
         bool clickable_;
         bool draggable_;
+        bool resizable_;
         bool keyboardListener_;
         float dragStartX_;
         float dragStartY_;
