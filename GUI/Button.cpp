@@ -30,7 +30,7 @@ namespace OGUI
         label_->SetText(str);
     }
 
-    void Button::onClick()
+    void Button::OnClick()
     {
         if (F) {
             F();

@@ -179,6 +179,7 @@ namespace OGUI
             }
         }
         fit(parent_->screenPos_);
+        OnResize();
     }
 
     void Widget::Move(float x, float y, float dx, float dy)
@@ -290,7 +291,7 @@ namespace OGUI
         mainWindow_->RegisterPressed(nullptr);
         mainWindow_->RegisterResized(nullptr, MainWindow::ResizeDirection::None);
         if (clickable_) {
-            onClick();
+            OnClick();
         }
         if (keyboardListener_) {
             mainWindow_->RegisterKeyboardListener(this);

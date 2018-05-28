@@ -55,7 +55,8 @@ namespace OGUI
         virtual void handleMouseUp(float x, float y);
         void setParent(Widget* w);
         void moveToTop(Widget* w);
-        virtual void onClick() { };
+        virtual void OnClick() { };
+        virtual void OnResize() {};
         Rect screenPos_;
         Rect relativePos_;
         TexturePos texPos_;

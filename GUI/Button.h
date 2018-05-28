@@ -11,7 +11,7 @@ namespace OGUI
         ~Button();
         void SetText(std::wstring& str);
         void SetText(const wchar_t* str);
-        void onClick() override;
+        void OnClick() override;
         void Bind();
         std::function<void(void)> F;
     protected:

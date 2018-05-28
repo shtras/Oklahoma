@@ -39,6 +39,7 @@ namespace OGUI
         void OnChildMove(Widget* w) override;
         void handleMouseEventSelf(SDL_Event& event, float x, float y) override;
     protected:
+        void OnResize() override;
         void RecalcContents();
         std::shared_ptr<ScrollBar> scrollBars_[ScrollBar::MAX_TYPE];
         float totalHeight_;

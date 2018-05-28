@@ -80,6 +80,11 @@ namespace OGUI
         scrollBars_[ScrollBar::VERTICAL]->SetPosition(scrollTop_ / totalHeight_, 1.0f / totalHeight_);
     }
 
+    void Window::OnResize()
+    {
+        RecalcContents();
+    }
+
     void Window::RecalcContents()
     {
         totalHeight_ = 1.0f;
@@ -87,7 +92,7 @@ namespace OGUI
             if (itr == scrollBars_[ScrollBar::VERTICAL] || itr == scrollBars_[ScrollBar::HORIZONTAL]) {
                 continue;
             }
-            float y = (itr->screenPos_.top + itr->screenPos_.height - screenPos_.top + scrollTop_*screenPos_.height) / screenPos_.height;
+            float y = scrollTop_ + itr->relativePos_.top + itr->relativePos_.height;
             if (y > totalHeight_) {
                 totalHeight_ = y;
             }
