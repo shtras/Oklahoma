@@ -12,20 +12,21 @@ namespace OGUI
         void HandleKeyboardEvent(SDL_Event& event);
         void SetMultiline(bool val);
     protected:
-        void Erase();
-        void MoveCursor(int x, int y, bool shift);
-        void HandleMouseEventSelf(SDL_Event& event, float x, float y) override;
-        void HandleMouseDown(float x, float y) override;
-        void GetCharPos(float fx, float fy, int& x, int& y);
-        int FindWordBoundary(int dx);
-        bool IsShift(SDL_Keysym& event);
-        bool IsCtrl(SDL_Keysym& event);
-        bool IsWordChar(wchar_t c);
-        void GetPosition(int x, int y, float* fx, float* fy);
-        bool HasSelection();
-        void RenderCursor();
+        void erase();
+        void moveCursor(int x, int y, bool shift);
+        void handleMouseEventSelf(SDL_Event& event, float x, float y) override;
+        void handleMouseDown(float x, float y) override;
+        void getCharPos(float fx, float fy, int& x, int& y);
+        int findWordBoundary(int dx);
+        bool isShift(SDL_Keysym& event);
+        bool isCtrl(SDL_Keysym& event);
+        bool isWordChar(wchar_t c);
+        void getPosition(int x, int y, float* fx, float* fy);
+        bool hasSelection();
+        void renderCursor();
+        wchar_t getChar(wchar_t c, SDL_Keysym& sym);
+
         std::vector<std::wstring> text_;
-        wchar_t GetChar(wchar_t c, SDL_Keysym& sym);
         std::map<wchar_t, wchar_t> shiftChars_;
         int cursorX_;
         int cursorY_;

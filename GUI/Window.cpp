@@ -73,7 +73,7 @@ namespace OGUI
             if (itr == scrollBars_[ScrollBar::VERTICAL] || itr == scrollBars_[ScrollBar::HORIZONTAL]) {
                 continue;
             }
-            itr->Move(dx * pos_.width, -dy * pos_.height);
+            itr->move(dx * pos_.width, -dy * pos_.height);
         }
         scrollBars_[ScrollBar::VERTICAL]->SetPosition(scrollTop_ / totalHeight_, 1.0f / totalHeight_);
     }
@@ -106,7 +106,7 @@ namespace OGUI
         RecalcContents();
     }
 
-    void Window::HandleMouseEventSelf(SDL_Event& event, float x, float y)
+    void Window::handleMouseEventSelf(SDL_Event& event, float x, float y)
     {
         switch (event.type)
         {
@@ -114,7 +114,7 @@ namespace OGUI
             Scroll(0, -event.wheel.y / 10.0f);
             break;
         default:
-            Widget::HandleMouseEventSelf(event, x, y);
+            Widget::handleMouseEventSelf(event, x, y);
             break;
         }
     }
@@ -185,7 +185,7 @@ namespace OGUI
         Renderer::GetInstance().RenderRect({pos_.left, pos_.top + pos_.height*(0.1f + y_), pos_.width, pos_.height * (height_ - 0.2f)}, positionUVs_);
     }
 
-    void ScrollBar::HandleMouseEventSelf(SDL_Event& event, float x, float y)
+    void ScrollBar::handleMouseEventSelf(SDL_Event& event, float x, float y)
     {
         Renderer& renderer = Renderer::GetInstance();
         switch (event.type)
@@ -197,7 +197,7 @@ namespace OGUI
             }
             break;
         default:
-            Widget::HandleMouseEventSelf(event, x, y);
+            Widget::handleMouseEventSelf(event, x, y);
             break;
         }
     }

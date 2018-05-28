@@ -38,7 +38,7 @@ int __stdcall WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance
     return 0;
 }
 
-void Oklahoma::PerfTest()
+void Oklahoma::perfTest()
 {
     for (int i = 0; i < 20; ++i) {
         for (int j = 0; j < 20; ++j) {
@@ -58,7 +58,7 @@ void Oklahoma::PerfTest()
     }
 }
 
-void Oklahoma::RegularTest()
+void Oklahoma::regularTest()
 {
     //     auto w00 = mainWindow_->CreateWidget<Window>(Rect({ 0.0f, 0.0f, 1.0f, 1.0f }));
     //     mainWindow_->AddWidget(w00);
@@ -74,19 +74,19 @@ void Oklahoma::RegularTest()
     w->AddWidget(w0);
 
     auto w1 = mainWindow_->CreateWidget<Window>(Rect({ 0.6f, 0.3f, 0.2f, 0.4f }));
-    //    w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
-    //     for (int i = 0; i < 15; ++i) {
-    //         auto l = mainWindow_->CreateWidget<Label>(Rect({ 0.1f, i * 0.15f, 0.8f, 0.15f }));
-    //         wchar_t txt[128];
-    //         swprintf_s(txt, L"Labeliko # %d", i);
-    //         l->SetText(txt);
-    //         w1->AddWidget(l);
-    //     }
+    w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
+     for (int i = 0; i < 15; ++i) {
+         auto l = mainWindow_->CreateWidget<Label>(Rect({ 0.1f, i * 0.15f, 0.8f, 0.15f }));
+         wchar_t txt[128];
+         swprintf_s(txt, L"Labeliko # %d", i);
+         l->SetText(txt);
+         w1->AddWidget(l);
+     }
     w->AddWidget(w1);
 
-    //     auto inp = mainWindow_->CreateWidget<TextInput>(Rect({0.1f, 0.1f, 0.8f, 0.5f}));
-    //     inp->SetMultiline(true);
-    //     w->AddWidget(inp);
+    auto inp = mainWindow_->CreateWidget<TextInput>(Rect({0.1f, 0.1f, 0.8f, 0.5f}));
+    inp->SetMultiline(true);
+    w->AddWidget(inp);
 
     auto inp1 = mainWindow_->CreateWidget<TextInput>(Rect({ 0.1f, 0.7f, 0.8f, 0.1f }));
     w->AddWidget(inp1);
@@ -102,7 +102,7 @@ void Oklahoma::Run()
     wchar_t fpsStr[128];
     auto& renderer = Renderer::GetInstance();
     
-    RegularTest();
+    regularTest();
     //PerfTest();
     auto fpsText = mainWindow_->CreateWidget<Label>(Rect({ 0.0f, 0.9f, 0.1f, 0.1f }));
     mainWindow_->AddWidget(fpsText);

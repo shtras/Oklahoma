@@ -39,8 +39,8 @@ namespace OGUI
     void Widget::Init(TexturePos texPos)
     {
         texPos_ = texPos;
-        CreateUVs(uvs_, texPos);
-        CreateRects();
+        createUVs(uvs_, texPos);
+        createRects();
         texState_ = REGULAR;
     }
 
@@ -50,7 +50,7 @@ namespace OGUI
         int dy = hoveredY - texPos_.t1;
         TexturePos texPosHovered = { texPos_.l1 + dx, texPos_.l2 + dx, texPos_.l3 + dx, texPos_.l4 + dx,
                                      texPos_.t1 + dy, texPos_.t2 + dy, texPos_.t3 + dy, texPos_.t4 + dy };
-        CreateUVs(hoveredUVs_, texPosHovered);
+        createUVs(hoveredUVs_, texPosHovered);
         texState_ |= HOVERED;
     }
 
@@ -60,11 +60,11 @@ namespace OGUI
         int dy = pressedY - texPos_.t1;
         TexturePos texPosPressed = { texPos_.l1 + dx, texPos_.l2 + dx, texPos_.l3 + dx, texPos_.l4 + dx,
             texPos_.t1 + dy, texPos_.t2 + dy, texPos_.t3 + dy, texPos_.t4 + dy };
-        CreateUVs(pressedUVs_, texPosPressed);
+        createUVs(pressedUVs_, texPosPressed);
         texState_ |= PRESSED;
     }
 
-    void Widget::CreateUVs(OGraphics::Rect* uvs, TexturePos& texPos)
+    void Widget::createUVs(OGraphics::Rect* uvs, TexturePos& texPos)
     {
         Renderer& renderer = Renderer::GetInstance();
         int width = renderer.GetWidth();
@@ -92,7 +92,7 @@ namespace OGUI
         uvs[8] = { fl3, ft3, fl4 - fl3, ft4 - ft3 };
     }
 
-    void Widget::CreateRects()
+    void Widget::createRects()
     {
         Renderer& renderer = Renderer::GetInstance();
         int width = renderer.GetWidth();
@@ -139,18 +139,18 @@ namespace OGUI
                 renderer.RenderRect(rects_[i], uvs[i]);
             }
         }
-        RenderChildren();
+        renderChildren();
     }
 
-    void Widget::Fit(Rect containingRect)
+    void Widget::fit(Rect containingRect)
     {
         pos_.left = containingRect.left + relativePos_.left * containingRect.width;
         pos_.top = containingRect.top + relativePos_.top * containingRect.height;
         pos_.width = relativePos_.width * containingRect.width;
         pos_.height = relativePos_.height * containingRect.height;
-        CreateRects();
+        createRects();
         for (auto& itr : children_) {
-            itr->Fit(pos_);
+            itr->fit(pos_);
         }
     }
 
@@ -158,29 +158,29 @@ namespace OGUI
     {
         relativePos_.width += dx / parent_->pos_.width;
         relativePos_.height += dy / parent_->pos_.height;
-        Fit(parent_->pos_);
+        fit(parent_->pos_);
     }
 
 
-    void Widget::Move(float x, float y, float dx, float dy)
+    void Widget::move(float x, float y, float dx, float dy)
     {
-        if (!parent_->IsWithin(x, y)) {
+        if (!parent_->isWithin(x, y)) {
             return;
         }
-        Move(dx, dy);
+        move(dx, dy);
     }
 
-    void Widget::Move(float dx, float dy)
+    void Widget::move(float dx, float dy)
     {
         relativePos_.left += dx / parent_->pos_.width;
         relativePos_.top += dy / parent_->pos_.height;
         if (parent_) {
             parent_->OnChildMove(this);
         }
-        Fit(parent_->pos_);
+        fit(parent_->pos_);
     }
 
-    void Widget::RenderChildren()
+    void Widget::renderChildren()
     {
         for (auto& itr : children_) {
             if (itr->pos_.top > pos_.top + pos_.height) {
@@ -190,7 +190,7 @@ namespace OGUI
         }
     }
 
-    bool Widget::IsWithin(float x, float y)
+    bool Widget::isWithin(float x, float y)
     {
         if (x < pos_.left || x > pos_.left + pos_.width) {
             return false;
@@ -201,15 +201,15 @@ namespace OGUI
         return true;
     }
 
-    void Widget::HandleMouseEventSelf(SDL_Event& event, float x, float y)
+    void Widget::handleMouseEventSelf(SDL_Event& event, float x, float y)
     {
         switch (event.type)
         {
         case SDL_MOUSEBUTTONDOWN:
-            HandleMouseDown(x, y);
+            handleMouseDown(x, y);
             break;
         case SDL_MOUSEBUTTONUP:
-            HandleMouseUp(x, y);
+            handleMouseUp(x, y);
             break;
         default:
             break;
@@ -246,10 +246,10 @@ namespace OGUI
         return ResizeDirection::None;
     }
 
-    void Widget::HandleMouseDown(float x, float y)
+    void Widget::handleMouseDown(float x, float y)
     {
         if (draggable_ && parent_) {
-            parent_->MoveToTop(this);
+            parent_->moveToTop(this);
         }
         if (resizable_) {
             auto resizeDir = GetResizeDirection(x, y);
@@ -265,13 +265,13 @@ namespace OGUI
         }
     }
 
-    void Widget::HandleMouseUp(float x, float y)
+    void Widget::handleMouseUp(float x, float y)
     {
         mainWindow_->RegisterDragged(nullptr);
         mainWindow_->RegisterPressed(nullptr);
         mainWindow_->RegisterResized(nullptr, MainWindow::ResizeDirection::None);
         if (clickable_) {
-            OnClick();
+            onClick();
         }
         if (keyboardListener_) {
             mainWindow_->RegisterKeyboardListener(this);
@@ -280,12 +280,12 @@ namespace OGUI
         }
     }
 
-    void Widget::SetParent(Widget* w)
+    void Widget::setParent(Widget* w)
     {
         parent_ = w;
     }
 
-    void Widget::MoveToTop(Widget* w)
+    void Widget::moveToTop(Widget* w)
     {
         std::shared_ptr<Widget> sp;
         for (auto& itr : children_) {
@@ -297,7 +297,7 @@ namespace OGUI
         children_.remove(sp);
         children_.push_back(sp);
         if (parent_) {
-            parent_->MoveToTop(this);
+            parent_->moveToTop(this);
         }
     }
 
@@ -334,8 +334,8 @@ namespace OGUI
     void Widget::AddWidget(std::shared_ptr<Widget> widget)
     {
         children_.push_back(widget);
-        widget->Fit(pos_);
-        widget->SetParent(this);
+        widget->fit(pos_);
+        widget->setParent(this);
     }
 
     bool Widget::HandleMouseEvent(SDL_Event& event, float x, float y)
@@ -343,7 +343,7 @@ namespace OGUI
         if (!interactive_ || !visible_) {
             return false;
         }
-        if (!IsWithin(x, y)) {
+        if (!isWithin(x, y)) {
             if (hovered_) {
                 mainWindow_->RegisterHovered(nullptr);
             }
@@ -389,7 +389,7 @@ namespace OGUI
             renderer.SetMouseCursor(Renderer::MouseCursor::Default);
         }
 
-        HandleMouseEventSelf(event, x, y);
+        handleMouseEventSelf(event, x, y);
         return true;
     }
 

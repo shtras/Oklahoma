@@ -12,9 +12,9 @@ public:
     void Init();
     void Quit();
 
-    void PerfTest();
-    void RegularTest();
 private:
+    void perfTest();
+    void regularTest();
 
     bool running_;
     std::unique_ptr<OGUI::MainWindow> mainWindow_ = nullptr;
