@@ -73,6 +73,9 @@ void Oklahoma::regularTest()
     auto w0 = mainWindow_->CreateWidget<Window>(Rect({ 0.1f, 0.3f, 0.5f, 0.4f }));
     w->AddWidget(w0);
 
+    auto w01 = mainWindow_->CreateWidget<Window>(Rect{0.1f, 0.1f, 0.5f, 0.5f});
+    w0->AddWidget(w01);
+
     auto w1 = mainWindow_->CreateWidget<Window>(Rect({ 0.6f, 0.3f, 0.2f, 0.4f }));
     w1->ToggleScrollBar(ScrollBar::VERTICAL, true);
      for (int i = 0; i < 15; ++i) {
@@ -84,12 +87,12 @@ void Oklahoma::regularTest()
      }
     w->AddWidget(w1);
 
-    auto inp = mainWindow_->CreateWidget<TextInput>(Rect({0.1f, 0.1f, 0.8f, 0.5f}));
-    inp->SetMultiline(true);
-    w->AddWidget(inp);
-
-    auto inp1 = mainWindow_->CreateWidget<TextInput>(Rect({ 0.1f, 0.7f, 0.8f, 0.1f }));
-    w->AddWidget(inp1);
+//     auto inp = mainWindow_->CreateWidget<TextInput>(Rect({0.1f, 0.1f, 0.8f, 0.5f}));
+//     inp->SetMultiline(true);
+//     w->AddWidget(inp);
+// 
+//     auto inp1 = mainWindow_->CreateWidget<TextInput>(Rect({ 0.1f, 0.7f, 0.8f, 0.1f }));
+//     w->AddWidget(inp1);
 
     mainWindow_->AddWidget(w);
 }

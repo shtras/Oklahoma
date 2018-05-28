@@ -18,6 +18,7 @@ namespace OGUI
         };
     public:
         enum class ResizeDirection { None, TopLeft, Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left };
+        enum ParentRelation : unsigned int { PPFloat = 0, PPScaledVertical = 1, PPScaledHorizontal = 2, PPStickRight = 4, PPStickBottom = 8 };
         friend class Window;
         virtual ~Widget();
         virtual void Render();
@@ -31,11 +32,13 @@ namespace OGUI
         void Init(TexturePos texPos);
         void SetHoveredTexture(int hoveredX, int hoveredY);
         void SetPressedTexture(int pressedX, int pressedY);
-        void move(float x, float y, float dx, float dy);
+        void Move(float x, float y, float dx, float dy);
+        void Move(float dx, float dy);
         void Resize(float dx, float dy);
         virtual void HandleKeyboardEvent(SDL_Event& event) { assert(0); };
         void SetDraggable(bool value);
         void SetVisible(bool value);
+        void SetParentRelation(unsigned int relation);
         virtual void OnChildMove(Widget* w);
         ResizeDirection GetResizeDirection(float x, float y) const;
     protected:
@@ -52,9 +55,8 @@ namespace OGUI
         virtual void handleMouseUp(float x, float y);
         void setParent(Widget* w);
         void moveToTop(Widget* w);
-        void move(float dx, float dy);
         virtual void onClick() { };
-        Rect pos_;
+        Rect screenPos_;
         Rect relativePos_;
         TexturePos texPos_;
         OGraphics::Rect uvs_[9];
@@ -79,5 +81,6 @@ namespace OGUI
         float dragStartY_;
         Widget* parent_;
         MainWindow* mainWindow_;
+        unsigned int parentRelation_ = PPFloat;
     };
 }

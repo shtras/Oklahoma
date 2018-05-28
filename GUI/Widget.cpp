@@ -6,7 +6,7 @@ namespace OGUI
 {
     static int NumWidgets = 0;
     Widget::Widget(OGraphics::Rect pos, OGUI::MainWindow* mw) :
-        pos_(pos),
+        screenPos_(pos),
         relativePos_(pos),
         hovered_(false),
         pressed_(false),
@@ -105,19 +105,19 @@ namespace OGUI
         int h3 = texPos_.t4 - texPos_.t3;
         float fw1 = w1 / (float)width;
         float fw3 = w3 / (float)width;
-        float fw2 = pos_.width - fw1 - fw3;
+        float fw2 = screenPos_.width - fw1 - fw3;
         float fh1 = h1 / (float)height;
         float fh3 = h3 / (float)height;
-        float fh2 = pos_.height - fh1 - fh3;
-        rects_[0] = { pos_.left, pos_.top, fw1, fh1 };
-        rects_[1] = { pos_.left + fw1, pos_.top, fw2, fh1 };
-        rects_[2] = { pos_.left + fw1 + fw2, pos_.top, fw3, fh1 };
-        rects_[3] = { pos_.left, pos_.top + fh1, fw1, fh2 };
-        rects_[4] = { pos_.left + fw1, pos_.top + fh1, fw2, fh2 };
-        rects_[5] = { pos_.left + fw1 + fw2, pos_.top + fh1, fw3, fh2 };
-        rects_[6] = { pos_.left, pos_.top + fh1 + fh2, fw1, fh3 };
-        rects_[7] = { pos_.left + fw1, pos_.top + fh1 + fh2, fw2, fh3 };
-        rects_[8] = { pos_.left + fw1 + fw2, pos_.top + fh1 + fh2, fw3, fh3 };
+        float fh2 = screenPos_.height - fh1 - fh3;
+        rects_[0] = { screenPos_.left, screenPos_.top, fw1, fh1 };
+        rects_[1] = { screenPos_.left + fw1, screenPos_.top, fw2, fh1 };
+        rects_[2] = { screenPos_.left + fw1 + fw2, screenPos_.top, fw3, fh1 };
+        rects_[3] = { screenPos_.left, screenPos_.top + fh1, fw1, fh2 };
+        rects_[4] = { screenPos_.left + fw1, screenPos_.top + fh1, fw2, fh2 };
+        rects_[5] = { screenPos_.left + fw1 + fw2, screenPos_.top + fh1, fw3, fh2 };
+        rects_[6] = { screenPos_.left, screenPos_.top + fh1 + fh2, fw1, fh3 };
+        rects_[7] = { screenPos_.left + fw1, screenPos_.top + fh1 + fh2, fw2, fh3 };
+        rects_[8] = { screenPos_.left + fw1 + fw2, screenPos_.top + fh1 + fh2, fw3, fh3 };
     }
 
     void Widget::Render()
@@ -144,46 +144,65 @@ namespace OGUI
 
     void Widget::fit(Rect containingRect)
     {
-        pos_.left = containingRect.left + relativePos_.left * containingRect.width;
-        pos_.top = containingRect.top + relativePos_.top * containingRect.height;
-        pos_.width = relativePos_.width * containingRect.width;
-        pos_.height = relativePos_.height * containingRect.height;
+        screenPos_.left = containingRect.left + relativePos_.left * containingRect.width;
+        screenPos_.top = containingRect.top + relativePos_.top * containingRect.height;
+        screenPos_.width = relativePos_.width * containingRect.width;
+        screenPos_.height = relativePos_.height * containingRect.height;
         createRects();
         for (auto& itr : children_) {
-            itr->fit(pos_);
+            itr->fit(screenPos_);
         }
     }
 
     void Widget::Resize(float dx, float dy)
     {
-        relativePos_.width += dx / parent_->pos_.width;
-        relativePos_.height += dy / parent_->pos_.height;
-        fit(parent_->pos_);
+        float prevRelWidth = relativePos_.width;
+        float prevRelHeight = relativePos_.height;
+        relativePos_.width += dx / parent_->screenPos_.width;
+        relativePos_.height += dy / parent_->screenPos_.height;
+        float dW = prevRelWidth / relativePos_.width;
+        float dH = prevRelHeight / relativePos_.height;
+        for (auto& itr : children_) {
+            if (!(itr->parentRelation_ & PPStickRight)) {
+                itr->relativePos_.left *= dW;
+            } else {
+                float distFromRight = 1.0f - itr->relativePos_.left - itr->relativePos_.width;
+                distFromRight *= dW;
+                itr->relativePos_.left = 1.0f - distFromRight - itr->relativePos_.width * dW;
+            }
+            if (!(itr->parentRelation_ & PPStickBottom)) {
+                itr->relativePos_.top *= dH;
+            }
+            itr->relativePos_.width *= dW;
+            if (!(itr->parentRelation_ & PPScaledVertical)) {
+                itr->relativePos_.height *= dH;
+            }
+        }
+        fit(parent_->screenPos_);
     }
 
-
-    void Widget::move(float x, float y, float dx, float dy)
+    void Widget::Move(float x, float y, float dx, float dy)
     {
         if (!parent_->isWithin(x, y)) {
             return;
         }
-        move(dx, dy);
+        Move(dx, dy);
     }
 
-    void Widget::move(float dx, float dy)
+    void Widget::Move(float dx, float dy)
     {
-        relativePos_.left += dx / parent_->pos_.width;
-        relativePos_.top += dy / parent_->pos_.height;
+        relativePos_.left += dx / parent_->screenPos_.width;
+        relativePos_.top += dy / parent_->screenPos_.height;
         if (parent_) {
             parent_->OnChildMove(this);
         }
-        fit(parent_->pos_);
+        fit(parent_->screenPos_);
     }
 
     void Widget::renderChildren()
     {
         for (auto& itr : children_) {
-            if (itr->pos_.top > pos_.top + pos_.height) {
+            if (itr->screenPos_.top > screenPos_.top + screenPos_.height) {
                 continue;
             }
             itr->Render();
@@ -192,10 +211,10 @@ namespace OGUI
 
     bool Widget::isWithin(float x, float y)
     {
-        if (x < pos_.left || x > pos_.left + pos_.width) {
+        if (x < screenPos_.left || x > screenPos_.left + screenPos_.width) {
             return false;
         }
-        if (y < pos_.top || y > pos_.top + pos_.height) {
+        if (y < screenPos_.top || y > screenPos_.top + screenPos_.height) {
             return false;
         }
         return true;
@@ -219,28 +238,28 @@ namespace OGUI
     Widget::ResizeDirection Widget::GetResizeDirection(float x, float y) const
     {
         float border = 0.1f;
-        if (x >= pos_.left + pos_.width * (1.0f - border) && y >= pos_.top + pos_.height * (1.0f - border)) {
+        if (x >= screenPos_.left + screenPos_.width * (1.0f - border) && y >= screenPos_.top + screenPos_.height * (1.0f - border)) {
             return ResizeDirection::BottomRight;
         }
-        if (x <= pos_.left + pos_.width * border && y >= pos_.top + pos_.height * (1.0f - border)) {
+        if (x <= screenPos_.left + screenPos_.width * border && y >= screenPos_.top + screenPos_.height * (1.0f - border)) {
             return ResizeDirection::BottomLeft;
         }
-        if (x >= pos_.left + pos_.width * (1.0f - border) && y <= pos_.top + pos_.height * border) {
+        if (x >= screenPos_.left + screenPos_.width * (1.0f - border) && y <= screenPos_.top + screenPos_.height * border) {
             return ResizeDirection::TopRight;
         }
-        if (x <= pos_.left + pos_.width * border && y <= pos_.top + pos_.height * border) {
+        if (x <= screenPos_.left + screenPos_.width * border && y <= screenPos_.top + screenPos_.height * border) {
             return ResizeDirection::TopLeft;
         }
-        if (x >= pos_.left + pos_.width * (1.0f - border)) {
+        if (x >= screenPos_.left + screenPos_.width * (1.0f - border)) {
             return ResizeDirection::Right;
         }
-        if (x <= pos_.left + pos_.width * border) {
+        if (x <= screenPos_.left + screenPos_.width * border) {
             return ResizeDirection::Left;
         }
-        if (y >= pos_.top + pos_.height * (1.0f - border)) {
+        if (y >= screenPos_.top + screenPos_.height * (1.0f - border)) {
             return ResizeDirection::Bottom;
         }
-        if (y <= pos_.top + pos_.height * border) {
+        if (y <= screenPos_.top + screenPos_.height * border) {
             return ResizeDirection::Top;
         }
         return ResizeDirection::None;
@@ -334,7 +353,7 @@ namespace OGUI
     void Widget::AddWidget(std::shared_ptr<Widget> widget)
     {
         children_.push_back(widget);
-        widget->fit(pos_);
+        widget->fit(screenPos_);
         widget->setParent(this);
     }
 
@@ -396,6 +415,11 @@ namespace OGUI
     void Widget::SetVisible(bool value)
     {
         visible_ = value;
+    }
+
+    void Widget::SetParentRelation(unsigned int relation)
+    {
+        parentRelation_ = relation;
     }
 
     void Widget::OnChildMove(Widget* w)

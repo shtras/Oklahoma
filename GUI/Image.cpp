@@ -18,7 +18,7 @@ namespace OGUI
 
     void Image::Render()
     {
-        Renderer::GetInstance().RenderRect(pos_, uvs_);
+        Renderer::GetInstance().RenderRect(screenPos_, uvs_);
     }
 
 }

@@ -101,7 +101,7 @@ namespace OGUI
             my_ = y;
             renderer.SetMouseCoords(x, y);
             if (draggedWidget_) {
-                draggedWidget_->move(x, y, event.motion.xrel / (float)renderer.GetWidth(), event.motion.yrel / (float)renderer.GetHeight());
+                draggedWidget_->Move(x, y, event.motion.xrel / (float)renderer.GetWidth(), event.motion.yrel / (float)renderer.GetHeight());
                 return true;
             }
             if (resizedWidget_) {
@@ -111,15 +111,15 @@ namespace OGUI
                     break;
                 case ResizeDirection::TopLeft:
                     resizedWidget_->Resize(-event.motion.xrel / (float)renderer.GetWidth(), -event.motion.yrel / (float)renderer.GetHeight());
-                    resizedWidget_->move(x, y, event.motion.xrel / (float)renderer.GetWidth(), event.motion.yrel / (float)renderer.GetHeight());
+                    resizedWidget_->Move(event.motion.xrel / (float)renderer.GetWidth(), event.motion.yrel / (float)renderer.GetHeight());
                     break;
                 case ResizeDirection::Top:
                     resizedWidget_->Resize(0, -event.motion.yrel / (float)renderer.GetHeight());
-                    resizedWidget_->move(x, y, 0, event.motion.yrel / (float)renderer.GetHeight());
+                    resizedWidget_->Move(0, event.motion.yrel / (float)renderer.GetHeight());
                     break;
                 case ResizeDirection::TopRight:
                     resizedWidget_->Resize(event.motion.xrel / (float)renderer.GetWidth(), -event.motion.yrel / (float)renderer.GetHeight());
-                    resizedWidget_->move(x, y, 0, event.motion.yrel / (float)renderer.GetHeight());
+                    resizedWidget_->Move(0, event.motion.yrel / (float)renderer.GetHeight());
                     break;
                 case ResizeDirection::Right:
                     resizedWidget_->Resize(event.motion.xrel / (float)renderer.GetWidth(), 0);
@@ -132,11 +132,11 @@ namespace OGUI
                     break;
                 case ResizeDirection::BottomLeft:
                     resizedWidget_->Resize(-event.motion.xrel / (float)renderer.GetWidth(), event.motion.yrel / (float)renderer.GetHeight());
-                    resizedWidget_->move(x, y, event.motion.xrel / (float)renderer.GetWidth(), 0);
+                    resizedWidget_->Move(event.motion.xrel / (float)renderer.GetWidth(), 0);
                     break;
                 case ResizeDirection::Left:
                     resizedWidget_->Resize(-event.motion.xrel / (float)renderer.GetWidth(), 0);
-                    resizedWidget_->move(x, y, event.motion.xrel / (float)renderer.GetWidth(), 0);
+                    resizedWidget_->Move(event.motion.xrel / (float)renderer.GetWidth(), 0);
                     break;
                 default:
                     break;

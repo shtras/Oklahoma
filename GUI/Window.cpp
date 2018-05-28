@@ -17,10 +17,12 @@ namespace OGUI
         Init({2, 62, 76, 82, 2, 36, 225, 240});
         SetHoveredTexture(85, 2);
         Renderer& renderer = Renderer::GetInstance();
-        float scrollWidth = 50 / (float)renderer.GetWidth();
-        float scrollHeight = 50 / (float)renderer.GetHeight();
+        float scrollWidth = 20 / (float)renderer.GetWidth() / pos.width;
+        float scrollHeight = 20 / (float)renderer.GetHeight() / pos.height;
         scrollBars_[ScrollBar::VERTICAL] = mw->CreateWidget<ScrollBar>(this, Rect({1.0f - scrollWidth - 2 * renderer.GetPixelWidth(), 2 * renderer.GetPixelHeight(), scrollWidth, 1.0f - scrollHeight}), ScrollBar::VERTICAL);
+        scrollBars_[ScrollBar::VERTICAL]->SetParentRelation(PPScaledVertical | PPStickRight);
         scrollBars_[ScrollBar::HORIZONTAL] = mw->CreateWidget<ScrollBar>(this, Rect({0.0f, 1.0f - scrollHeight, 1.0f - scrollWidth, scrollHeight}), ScrollBar::HORIZONTAL);
+        scrollBars_[ScrollBar::HORIZONTAL]->SetParentRelation(Widget::PPScaledHorizontal);
         AddWidget(scrollBars_[ScrollBar::VERTICAL]);
         AddWidget(scrollBars_[ScrollBar::HORIZONTAL]);
     }
@@ -32,7 +34,7 @@ namespace OGUI
 
     void Window::Render()
     {
-        Renderer::GetInstance().PushBound(pos_);
+        Renderer::GetInstance().PushBound(screenPos_);
         Widget::Render();
         Renderer::GetInstance().PopBound();
     }
@@ -73,7 +75,7 @@ namespace OGUI
             if (itr == scrollBars_[ScrollBar::VERTICAL] || itr == scrollBars_[ScrollBar::HORIZONTAL]) {
                 continue;
             }
-            itr->move(dx * pos_.width, -dy * pos_.height);
+            itr->Move(dx * screenPos_.width, -dy * screenPos_.height);
         }
         scrollBars_[ScrollBar::VERTICAL]->SetPosition(scrollTop_ / totalHeight_, 1.0f / totalHeight_);
     }
@@ -85,7 +87,7 @@ namespace OGUI
             if (itr == scrollBars_[ScrollBar::VERTICAL] || itr == scrollBars_[ScrollBar::HORIZONTAL]) {
                 continue;
             }
-            float y = (itr->pos_.top + itr->pos_.height - pos_.top + scrollTop_*pos_.height) / pos_.height;
+            float y = (itr->screenPos_.top + itr->screenPos_.height - screenPos_.top + scrollTop_*screenPos_.height) / screenPos_.height;
             if (y > totalHeight_) {
                 totalHeight_ = y;
             }
@@ -141,6 +143,7 @@ namespace OGUI
             arrow2_ = mainWindow_->CreateWidget<Button>(Rect({ 0.0f, 0.9f, 1.0f, 0.1f }));
             arrow2_->Init({ 183, 185, 196, 199, 38, 38, 22, 22 });
             AddWidget(arrow2_);
+            arrow2_->SetParentRelation(Widget::PPStickBottom);
             arrow2_->F = std::bind(&ScrollBar::ScrollDown, this);
             break;
         case OGUI::ScrollBar::HORIZONTAL:
@@ -149,6 +152,7 @@ namespace OGUI
             AddWidget(arrow1_);
             arrow2_ = mainWindow_->CreateWidget<Button>(Rect({ 0.9f, 0.0f, 0.1f, 1.0f }));
             arrow2_->Init({ 216, 214, 203, 201, 22, 22, 38, 38 });
+            arrow2_->SetParentRelation(Widget::PPStickRight);
             AddWidget(arrow2_);
             break;
         default:
@@ -182,7 +186,7 @@ namespace OGUI
 
         Widget::Render();
         Renderer::GetInstance().SetTexture(Renderer::TextureType::GUI);
-        Renderer::GetInstance().RenderRect({pos_.left, pos_.top + pos_.height*(0.1f + y_), pos_.width, pos_.height * (height_ - 0.2f)}, positionUVs_);
+        Renderer::GetInstance().RenderRect({screenPos_.left, screenPos_.top + screenPos_.height*(0.1f + y_), screenPos_.width, screenPos_.height * (height_ - 0.2f)}, positionUVs_);
     }
 
     void ScrollBar::handleMouseEventSelf(SDL_Event& event, float x, float y)
@@ -193,7 +197,7 @@ namespace OGUI
         case SDL_MOUSEMOTION:
             if (pressed_) {
                 float dy = event.motion.yrel / (float)renderer.GetHeight();
-                wnd_->Scroll(0, dy / height_ / pos_.height);
+                wnd_->Scroll(0, dy / height_ / screenPos_.height);
             }
             break;
         default:

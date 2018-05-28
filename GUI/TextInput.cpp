@@ -64,7 +64,7 @@ namespace OGUI {
         Widget::Render();
         renderer.SetCharSize(charWidth_, charHeight_);
         for (int i = 0; i < text_.size(); ++i) {
-            renderer.RenderText(text_[i].c_str(), pos_.left, pos_.top + i * charHeight_ * renderer.GetPixelHeight());
+            renderer.RenderText(text_[i].c_str(), screenPos_.left, screenPos_.top + i * charHeight_ * renderer.GetPixelHeight());
         }
         if (keyFocus_) {
             renderCursor();
@@ -81,7 +81,7 @@ namespace OGUI {
                     std::swap(x1, x2);
                 }
                 for (int y = y1; y <= y2; ++y) {
-                    Rect selectionPos = { pos_.left, pos_.top + y * charHeight_ * renderer.GetPixelHeight(), charWidth_ * text_[y].length() * renderer.GetPixelWidth(), charHeight_ * renderer.GetPixelHeight() };
+                    Rect selectionPos = { screenPos_.left, screenPos_.top + y * charHeight_ * renderer.GetPixelHeight(), charWidth_ * text_[y].length() * renderer.GetPixelWidth(), charHeight_ * renderer.GetPixelHeight() };
                     if (y == y1) {
                         selectionPos.left += x1 * charWidth_ * renderer.GetPixelWidth();
                         selectionPos.width -= x1 * charWidth_ * renderer.GetPixelWidth();
@@ -274,8 +274,8 @@ namespace OGUI {
 
     void TextInput::getCharPos(float fx, float fy, int& x, int& y)
     {
-        x = (int)((fx - pos_.left) / (charWidth_ * Renderer::GetInstance().GetPixelWidth()));
-        y = (int)((fy - pos_.top) / (charHeight_ * Renderer::GetInstance().GetPixelHeight()));
+        x = (int)((fx - screenPos_.left) / (charWidth_ * Renderer::GetInstance().GetPixelWidth()));
+        y = (int)((fy - screenPos_.top) / (charHeight_ * Renderer::GetInstance().GetPixelHeight()));
     }
 
     int TextInput::findWordBoundary(int dx)
@@ -320,8 +320,8 @@ namespace OGUI {
     void TextInput::getPosition(int x, int y, float* fx, float* fy)
     {
         Renderer& renderer = Renderer::GetInstance();
-        *fx = pos_.left + (x - 0.5f) * charWidth_ * renderer.GetPixelWidth();
-        *fy = pos_.top + y * charHeight_ * renderer.GetPixelHeight();
+        *fx = screenPos_.left + (x - 0.5f) * charWidth_ * renderer.GetPixelWidth();
+        *fy = screenPos_.top + y * charHeight_ * renderer.GetPixelHeight();
     }
 
     bool TextInput::hasSelection()
